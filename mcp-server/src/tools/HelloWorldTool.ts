@@ -1,51 +1,52 @@
-import { Tool } from "../interfaces/Tool.js";
-import { Tool as MCPTool } from "@modelcontextprotocol/sdk/types.js";
+import { IsString, IsNotEmpty } from "class-validator";
+import { TypeSafeTool } from "../interfaces/Tool.js";
+import "reflect-metadata";
 
 /**
- * A simple demonstration tool that returns a personalized greeting message.
- *
- * This tool serves as a basic example of the Tool interface implementation
- * and provides personalized "Hello, <name>!" functionality for testing purposes.
+ * Arguments class for the HelloWorld tool with validation decorators.
  */
-export class HelloWorldTool implements Tool {
+export class HelloWorldArgs {
     /**
-     * The tool definition as required by the MCP protocol.
+     * The name to include in the greeting message.
      */
-    readonly definition: MCPTool = {
-        name: "hello_world",
-        description: "Returns a personalized greeting message with the provided name",
-        inputSchema: {
-            type: "object",
-            properties: {
-                name: {
-                    type: "string",
-                    description: "The name to include in the greeting message",
-                },
-            },
-            required: ["name"],
-            additionalProperties: false,
-        },
-    };
+    @IsString({ message: "Name must be a string" })
+    @IsNotEmpty({ message: "Name cannot be empty" })
+    name!: string;
+}
+
+/**
+ * Type-safe HelloWorld tool with automatic validation and schema generation.
+ *
+ * This tool directly implements the Tool interface while maintaining full
+ * type safety through the protected executeTypeSafe method.
+ */
+export class HelloWorldTool extends TypeSafeTool<HelloWorldArgs> {
+    constructor() {
+        super(HelloWorldArgs);
+    }
+
+    protected getToolName(): string {
+        return "hello_world";
+    }
+
+    protected getToolDescription(): string {
+        return "Returns a personalized greeting message with the provided name";
+    }
 
     /**
-     * Executes the hello world functionality with personalized greeting.
+     * Executes the hello world functionality with type-safe, validated arguments.
      *
-     * @param args - The tool arguments containing the name parameter
-     * @returns A promise resolving to the personalized greeting message
+     * This method receives fully validated arguments with complete type safety.
+     * No casting or manual validation is required.
+     *
+     * @param args - The validated HelloWorldArgs instance
      */
-    async execute(args: unknown): Promise<{ content: Array<{ type: string; text: string }> }> {
-        // Validate and extract the name from arguments
-        const typedArgs = args as { name?: string };
-
-        if (!typedArgs.name || typeof typedArgs.name !== "string") {
-            throw new Error("Name parameter is required and must be a string");
-        }
-
+    protected async executeTypeSafe(args: HelloWorldArgs): Promise<{ content: Array<{ type: string; text: string }> }> {
         return {
             content: [
                 {
                     type: "text",
-                    text: `Hello, ${typedArgs.name}!`,
+                    text: `Hello, ${args.name}! This greeting was generated with full type safety and automatic validation.`,
                 },
             ],
         };

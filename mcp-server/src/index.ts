@@ -41,7 +41,9 @@ class PenpotMcpServer {
      * the internal registry for later execution.
      */
     private registerTools(): void {
-        const toolInstances: Tool[] = [new HelloWorldTool()];
+        const toolInstances: Tool[] = [
+            new HelloWorldTool()
+        ];
 
         for (const tool of toolInstances) {
             this.tools.set(tool.definition.name, tool);
