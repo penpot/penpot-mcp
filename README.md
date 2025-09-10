@@ -7,8 +7,8 @@ This document explains how to test the basic WebSocket connection between the MC
 The system consists of two main components:
 
 1. **MCP Server** (`mcp-server/`): 
-   - Runs as a traditional MCP server (stdio transport)
-   - Also runs a WebSocket server on port 8080
+   - Runs as an MCP server (stdio transport)
+   - Runs a WebSocket server on port 8080
    - Basic WebSocket connection handling (protocol to be defined later)
 
 2. **Penpot Plugin** (`penpot-plugin/`):

@@ -4,7 +4,8 @@ A Model Context Protocol (MCP) server that provides Penpot integration capabilit
 
 ## Overview
 
-This MCP server implements a clean, object-oriented architecture that allows easy extension with new tools. It currently includes a demonstration tool and provides a foundation for adding Penpot-specific functionality.
+This MCP server implements a clean, object-oriented architecture that allows easy extension with new tools.
+It currently includes a demonstration tool and provides a foundation for adding Penpot-specific functionality.
 
 ## Prerequisites
 
@@ -35,8 +36,21 @@ npm run dev
 
 **Production Mode** (requires build first):
 ```bash
-npm run start
+npm start
 ```
+
+**With Custom Port**:
+```bash
+npm start -- --port 8080
+# OR in development
+npm run dev -- --port 8080
+# OR directly
+node dist/index.js --port 8080
+```
+
+**Available Options**:
+- `--port, -p <number>`: Port number for the HTTP/SSE server (default: 4401)
+- `--help, -h`: Show help message
 
 ## Available Commands
 
@@ -51,59 +65,60 @@ npm run start
 
 ## Claude Desktop Integration
 
-To use this MCP server with Claude Desktop, you need to add it to Claude's configuration file.
+The MCP server now supports both modern Streamable HTTP and legacy SSE transports, providing compatibility with various MCP clients.
 
-### 1. Locate Claude Desktop Config
+### 1. Start the Server
+
+First, build and start the MCP server:
+
+```bash
+cd mcp-server
+npm run build
+npm start
+```
+
+By default, the server runs on port 4401 and provides:
+- **Modern Streamable HTTP endpoint**: `http://localhost:4401/mcp`
+- **Legacy SSE endpoint**: `http://localhost:4401/sse`
+
+### 2. Configure Claude Desktop
+
+For Claude Desktop integration, you'll need to use a proxy since Claude Desktop requires stdio transport.
+
+**Option A: Using mcp-remote (Recommended)**
+
+Install mcp-remote globally if you haven't already:
+```bash
+npm install -g mcp-remote
+```
+
+Add this to your Claude Desktop configuration file:
 
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
-
-### 2. Add Server Configuration
-
-Edit the config file to include your MCP server:
 
 ```json
 {
     "mcpServers": {
         "penpot": {
-            "command": "node",
-            "args": [
-                "/path/to/your/penpot-mcp/mcp-server/dist/index.js"
-            ]
+            "command": "npx",
+            "args": ["-y", "mcp-remote", "http://localhost:4401/sse", "--allow-http"]
         }
     }
 }
 ```
 
-**Important Notes:**
-- Replace `/path/to/your/penpot-mcp/mcp-server/dist/index.js` with the actual absolute path to your built server
-- Ensure you've run `npm run build` before adding to Claude Desktop
-- On Windows, use forward slashes `/` or double backslashes `\\` in the path
+**Option B: Direct HTTP Integration (for other MCP clients)**
 
-### 3. Alternative Development Setup
+For MCP clients that support HTTP transport directly, use:
+- Modern clients: `http://localhost:4401/mcp`
+- Legacy clients: `http://localhost:4401/sse`
 
-For development, you can also run the server directly with ts-node:
-
-```json
-{
-    "mcpServers": {
-        "penpot-mcp-server": {
-            "command": "node",
-            "args": [
-                "--loader", "ts-node/esm",
-                "/path/to/your/penpot-mcp/mcp-server/src/index.ts"
-            ],
-            "env": {}
-        }
-    }
-}
-```
-
-### 4. Restart Claude Desktop
+### 3. Restart Claude Desktop
 
 After updating the configuration file, restart Claude Desktop completely for the changes to take effect.
 
-### 5. Verify Integration
+### 4. Verify Integration
 
 Once Claude Desktop restarts, you should be able to use the MCP server's tools in your conversations. You can test with the included `hello_world` tool:
 
