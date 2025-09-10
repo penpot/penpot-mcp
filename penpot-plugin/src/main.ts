@@ -38,7 +38,13 @@ function connectToMcpServer(): void {
 
     ws.onmessage = (event) => {
       console.log("Received from MCP server:", event.data);
-      // Protocol will be defined later
+      try {
+        const message = JSON.parse(event.data);
+        // Forward the task to the plugin for execution
+        parent.postMessage(message, "*");
+      } catch (error) {
+        console.error("Failed to parse WebSocket message:", error);
+      }
     };
 
     ws.onclose = () => {

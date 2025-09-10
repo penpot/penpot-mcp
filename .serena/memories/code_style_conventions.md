@@ -21,7 +21,7 @@
 ## Documentation Style
 - **JSDoc**: Use comprehensive JSDoc comments for classes, methods, and interfaces
 - **Description Format**: Initial elliptical phrase defines *what* it is, followed by details
-- **Comment Style**: Start with lowercase for code blocks unless lengthy explanation with multiple sentences
+- **Comment Style**: Start with lowercase for comments of code blocks (unless lengthy explanation with multiple sentences)
 
 ## Code Organization
 - **Separation of Concerns**: Interfaces in separate directory from implementations

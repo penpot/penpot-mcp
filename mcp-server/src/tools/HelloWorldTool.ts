@@ -41,7 +41,9 @@ export class HelloWorldTool extends TypeSafeTool<HelloWorldArgs> {
      *
      * @param args - The validated HelloWorldArgs instance
      */
-    protected async executeTypeSafe(args: HelloWorldArgs): Promise<{ content: Array<{ type: string; text: string }> }> {
+    protected async executeTypeSafe(
+        args: HelloWorldArgs
+    ): Promise<{ content: Array<{ type: string; text: string }> }> {
         return {
             content: [
                 {

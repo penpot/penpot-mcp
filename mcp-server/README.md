@@ -9,7 +9,7 @@ It currently includes a demonstration tool and provides a foundation for adding 
 
 ## Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm
 
 ## Installation & Setup
@@ -30,16 +30,19 @@ npm run build
 ### 3. Run the Server
 
 **Development Mode** (with TypeScript compilation):
+
 ```bash
 npm run dev
 ```
 
 **Production Mode** (requires build first):
+
 ```bash
 npm start
 ```
 
 **With Custom Port**:
+
 ```bash
 npm start -- --port 8080
 # OR in development
@@ -49,19 +52,20 @@ node dist/index.js --port 8080
 ```
 
 **Available Options**:
+
 - `--port, -p <number>`: Port number for the HTTP/SSE server (default: 4401)
 - `--help, -h`: Show help message
 
 ## Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install all dependencies |
-| `npm run build` | Compile TypeScript to JavaScript |
-| `npm run start` | Start the built server |
-| `npm run dev` | Start in development mode with ts-node |
-| `npm run format` | Format all files with Prettier |
-| `npm run format:check` | Check if files are properly formatted |
+| Command                | Description                            |
+| ---------------------- | -------------------------------------- |
+| `npm install`          | Install all dependencies               |
+| `npm run build`        | Compile TypeScript to JavaScript       |
+| `npm run start`        | Start the built server                 |
+| `npm run dev`          | Start in development mode with ts-node |
+| `npm run format`       | Format all files with Prettier         |
+| `npm run format:check` | Check if files are properly formatted  |
 
 ## Claude Desktop Integration
 
@@ -78,6 +82,7 @@ npm start
 ```
 
 By default, the server runs on port 4401 and provides:
+
 - **Modern Streamable HTTP endpoint**: `http://localhost:4401/mcp`
 - **Legacy SSE endpoint**: `http://localhost:4401/sse`
 
@@ -88,6 +93,7 @@ For Claude Desktop integration, you'll need to use a proxy since Claude Desktop 
 **Option A: Using mcp-remote (Recommended)**
 
 Install mcp-remote globally if you haven't already:
+
 ```bash
 npm install -g mcp-remote
 ```
@@ -111,6 +117,7 @@ Add this to your Claude Desktop configuration file:
 **Option B: Direct HTTP Integration (for other MCP clients)**
 
 For MCP clients that support HTTP transport directly, use:
+
 - Modern clients: `http://localhost:4401/mcp`
 - Legacy clients: `http://localhost:4401/sse`
 
@@ -172,17 +179,20 @@ export class MyCustomTool implements Tool {
 ## Troubleshooting
 
 ### Server Won't Start
+
 - Ensure all dependencies are installed: `npm install`
 - Check that the project builds without errors: `npm run build`
 - Verify Node.js version is 18 or higher: `node --version`
 
 ### Claude Desktop Can't Find Server
+
 - Verify the absolute path in your configuration is correct
 - Ensure the server is built (`npm run build`) before referencing `dist/index.js`
 - Check that the JSON configuration file is valid
 - Restart Claude Desktop completely after config changes
 
 ### Tools Not Available
+
 - Confirm the server is listed in Claude Desktop's configuration
 - Check the Claude Desktop console/logs for any error messages
 - Verify tools are properly registered in the `registerTools()` method
@@ -190,6 +200,7 @@ export class MyCustomTool implements Tool {
 ## Development
 
 This project uses:
+
 - **TypeScript** for type safety and better development experience
 - **Prettier** with 4-space indentation for consistent code formatting
 - **ESM modules** for modern JavaScript compatibility

@@ -28,7 +28,7 @@ export interface Tool {
  * Metadata for schema generation from class properties.
  */
 interface PropertyMetadata {
-    type: 'string' | 'number' | 'boolean' | 'array' | 'object';
+    type: "string" | "number" | "boolean" | "array" | "object";
     description: string;
     required: boolean;
 }
@@ -43,7 +43,7 @@ interface PropertyMetadata {
  */
 export abstract class TypeSafeTool<TArgs extends object> implements Tool {
     private _definition: MCPTool | undefined;
-    
+
     constructor(private ArgsClass: new () => TArgs) {}
 
     /**
@@ -70,13 +70,13 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
         try {
             // Transform plain object to class instance
             const argsInstance = plainToClass(this.ArgsClass, args as object);
-            
+
             // Validate using class-validator decorators
             const errors = await validate(argsInstance);
-            
+
             if (errors.length > 0) {
                 const errorMessages = this.formatValidationErrors(errors);
-                throw new Error(`Validation failed: ${errorMessages.join(', ')}`);
+                throw new Error(`Validation failed: ${errorMessages.join(", ")}`);
             }
 
             // Call the type-safe implementation
@@ -98,14 +98,14 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
         const required: string[] = [];
 
         const propertyNames = this.getPropertyNames(instance);
-        
+
         for (const propName of propertyNames) {
             const metadata = this.getPropertyMetadata(this.ArgsClass, propName);
             properties[propName] = {
                 type: metadata.type,
                 description: metadata.description,
             };
-            
+
             if (metadata.required) {
                 required.push(propName);
             }
@@ -125,14 +125,15 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
     private getPropertyNames(instance: TArgs): string[] {
         const prototype = Object.getPrototypeOf(instance);
         const propertyNames: string[] = [];
-        
+
         propertyNames.push(...Object.getOwnPropertyNames(instance));
         propertyNames.push(...Object.getOwnPropertyNames(prototype));
-        
-        return propertyNames.filter(name => 
-            name !== 'constructor' && 
-            !name.startsWith('_') &&
-            typeof (instance as any)[name] !== 'function'
+
+        return propertyNames.filter(
+            (name) =>
+                name !== "constructor" &&
+                !name.startsWith("_") &&
+                typeof (instance as any)[name] !== "function"
         );
     }
 
@@ -140,40 +141,42 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
      * Extracts property metadata from class-validator decorators.
      */
     private getPropertyMetadata(target: any, propertyKey: string): PropertyMetadata {
-        const validationMetadata = Reflect.getMetadata('class-validator:storage', target) || {};
+        const validationMetadata = Reflect.getMetadata("class-validator:storage", target) || {};
         const constraints = validationMetadata.validationMetadatas || [];
-        
+
         let isRequired = true;
-        let type: PropertyMetadata['type'] = 'string';
+        let type: PropertyMetadata["type"] = "string";
         let description = `${propertyKey} parameter`;
 
         for (const constraint of constraints) {
             if (constraint.propertyName === propertyKey) {
                 switch (constraint.type) {
-                    case 'isOptional':
+                    case "isOptional":
                         isRequired = false;
                         break;
-                    case 'isString':
-                        type = 'string';
+                    case "isString":
+                        type = "string";
                         break;
-                    case 'isNumber':
-                        type = 'number';
+                    case "isNumber":
+                        type = "number";
                         break;
-                    case 'isBoolean':
-                        type = 'boolean';
+                    case "isBoolean":
+                        type = "boolean";
                         break;
-                    case 'isArray':
-                        type = 'array';
+                    case "isArray":
+                        type = "array";
                         break;
                 }
             }
         }
 
         // Fallback type inference
-        if (propertyKey.toLowerCase().includes('count') || 
-            propertyKey.toLowerCase().includes('number') ||
-            propertyKey.toLowerCase().includes('amount')) {
-            type = 'number';
+        if (
+            propertyKey.toLowerCase().includes("count") ||
+            propertyKey.toLowerCase().includes("number") ||
+            propertyKey.toLowerCase().includes("amount")
+        ) {
+            type = "number";
         }
 
         return { type, description, required: isRequired };
@@ -183,9 +186,9 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
      * Formats validation errors into human-readable messages.
      */
     private formatValidationErrors(errors: ValidationError[]): string[] {
-        return errors.map(error => {
+        return errors.map((error) => {
             const constraints = Object.values(error.constraints || {});
-            return `${error.property}: ${constraints.join(', ')}`;
+            return `${error.property}: ${constraints.join(", ")}`;
         });
     }
 
@@ -207,5 +210,7 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
      *
      * @param args - The validated, strongly-typed arguments
      */
-    protected abstract executeTypeSafe(args: TArgs): Promise<{ content: Array<{ type: string; text: string }> }>;
+    protected abstract executeTypeSafe(
+        args: TArgs
+    ): Promise<{ content: Array<{ type: string; text: string }> }>;
 }

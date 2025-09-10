@@ -2,16 +2,16 @@
 
 /**
  * Penpot MCP Server with HTTP and SSE Transport Support
- * 
+ *
  * This server implementation supports both modern Streamable HTTP and legacy SSE transports
  * instead of the traditional stdio transport. This provides better compatibility with
  * web-based MCP clients and allows for more flexible deployment scenarios.
- * 
+ *
  * Transport Endpoints:
  * - Modern Streamable HTTP: POST/GET/DELETE /mcp
  * - Legacy SSE: GET /sse and POST /messages
  * - WebSocket (for plugin communication): ws://localhost:8080
- * 
+ *
  * Usage:
  * - Default port: node dist/index.js (runs on 4401)
  * - Custom port: node dist/index.js --port 8080
@@ -24,6 +24,7 @@ import { WebSocketServer, WebSocket } from "ws";
 
 import { Tool } from "./interfaces/Tool.js";
 import { HelloWorldTool } from "./tools/HelloWorldTool.js";
+import { ToolPrintText } from "./tools/ToolPrintText.js";
 
 /**
  * Main MCP server implementation for Penpot integration.
@@ -42,12 +43,12 @@ class PenpotMcpServer {
     // Store transports for each session type
     private readonly transports = {
         streamable: {} as Record<string, any>, // StreamableHTTPServerTransport
-        sse: {} as Record<string, any> // SSEServerTransport
+        sse: {} as Record<string, any>, // SSEServerTransport
     };
 
     /**
      * Creates a new Penpot MCP server instance.
-     * 
+     *
      * @param port - The port number for the HTTP/SSE server
      */
     constructor(port: number = 4401) {
@@ -66,7 +67,7 @@ class PenpotMcpServer {
 
         this.tools = new Map<string, Tool>();
         this.wsServer = new WebSocketServer({ port: 8080 });
-        
+
         this.setupMcpHandlers();
         this.setupWebSocketHandlers();
         this.registerTools();
@@ -80,7 +81,8 @@ class PenpotMcpServer {
      */
     private registerTools(): void {
         const toolInstances: Tool[] = [
-            new HelloWorldTool()
+            new HelloWorldTool(),
+            new ToolPrintText(this.connectedClients),
         ];
 
         for (const tool of toolInstances) {
@@ -126,17 +128,17 @@ class PenpotMcpServer {
      */
     private setupHttpEndpoints(): void {
         // Modern Streamable HTTP endpoint
-        this.app.all('/mcp', async (req: any, res: any) => {
+        this.app.all("/mcp", async (req: any, res: any) => {
             await this.handleStreamableHttpRequest(req, res);
         });
 
         // Legacy SSE endpoint for older clients
-        this.app.get('/sse', async (req: any, res: any) => {
+        this.app.get("/sse", async (req: any, res: any) => {
             await this.handleSseConnection(req, res);
         });
 
         // Legacy message endpoint for older clients
-        this.app.post('/messages', async (req: any, res: any) => {
+        this.app.post("/messages", async (req: any, res: any) => {
             await this.handleSseMessage(req, res);
         });
     }
@@ -148,12 +150,14 @@ class PenpotMcpServer {
      * streamable HTTP transport protocol.
      */
     private async handleStreamableHttpRequest(req: any, res: any): Promise<void> {
-        const { StreamableHTTPServerTransport } = await import("@modelcontextprotocol/sdk/server/streamableHttp.js");
+        const { StreamableHTTPServerTransport } = await import(
+            "@modelcontextprotocol/sdk/server/streamableHttp.js"
+        );
         const { randomUUID } = await import("node:crypto");
         const { isInitializeRequest } = await import("@modelcontextprotocol/sdk/types.js");
 
         // Check for existing session ID
-        const sessionId = req.headers['mcp-session-id'] as string | undefined;
+        const sessionId = req.headers["mcp-session-id"] as string | undefined;
         let transport: any;
 
         if (sessionId && this.transports.streamable[sessionId]) {
@@ -185,10 +189,10 @@ class PenpotMcpServer {
         } else {
             // Invalid request
             res.status(400).json({
-                jsonrpc: '2.0',
+                jsonrpc: "2.0",
                 error: {
                     code: -32000,
-                    message: 'Bad Request: No valid session ID provided',
+                    message: "Bad Request: No valid session ID provided",
                 },
                 id: null,
             });
@@ -207,15 +211,15 @@ class PenpotMcpServer {
      */
     private async handleSseConnection(req: any, res: any): Promise<void> {
         const { SSEServerTransport } = await import("@modelcontextprotocol/sdk/server/sse.js");
-        
+
         // Create SSE transport for legacy clients
-        const transport = new SSEServerTransport('/messages', res);
+        const transport = new SSEServerTransport("/messages", res);
         this.transports.sse[transport.sessionId] = transport;
-        
+
         res.on("close", () => {
             delete this.transports.sse[transport.sessionId];
         });
-        
+
         await this.server.connect(transport);
     }
 
@@ -228,11 +232,11 @@ class PenpotMcpServer {
     private async handleSseMessage(req: any, res: any): Promise<void> {
         const sessionId = req.query.sessionId as string;
         const transport = this.transports.sse[sessionId];
-        
+
         if (transport) {
             await transport.handlePostMessage(req, res, req.body);
         } else {
-            res.status(400).send('No transport found for sessionId');
+            res.status(400).send("No transport found for sessionId");
         }
     }
 
@@ -274,12 +278,12 @@ class PenpotMcpServer {
      */
     async start(): Promise<void> {
         // Import express as ES module and setup HTTP endpoints
-        const { default: express } = await import('express');
+        const { default: express } = await import("express");
         this.app = express();
         this.app.use(express.json());
-        
+
         this.setupHttpEndpoints();
-        
+
         return new Promise((resolve) => {
             this.app.listen(this.port, () => {
                 console.error(`Penpot MCP Server started successfully on port ${this.port}`);
@@ -305,7 +309,7 @@ async function main(): Promise<void> {
         let port = 4401; // Default port
 
         for (let i = 0; i < args.length; i++) {
-            if (args[i] === '--port' || args[i] === '-p') {
+            if (args[i] === "--port" || args[i] === "-p") {
                 if (i + 1 < args.length) {
                     const portArg = parseInt(args[i + 1], 10);
                     if (!isNaN(portArg) && portArg > 0 && portArg <= 65535) {
@@ -314,10 +318,12 @@ async function main(): Promise<void> {
                         console.error("Invalid port number. Using default port 4401.");
                     }
                 }
-            } else if (args[i] === '--help' || args[i] === '-h') {
+            } else if (args[i] === "--help" || args[i] === "-h") {
                 console.log("Usage: node dist/index.js [options]");
                 console.log("Options:");
-                console.log("  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)");
+                console.log(
+                    "  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)"
+                );
                 console.log("  --help, -h             Show this help message");
                 process.exit(0);
             }
