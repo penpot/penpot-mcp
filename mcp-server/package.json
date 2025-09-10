@@ -1,0 +1,26 @@
+{
+  "name": "penpot-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Penpot integration",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "node --loader ts-node/esm src/index.ts"
+  },
+  "keywords": ["mcp", "penpot", "server"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "ts-node": {
+    "esm": true
+  }
+}
