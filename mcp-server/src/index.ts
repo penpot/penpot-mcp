@@ -3,6 +3,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { WebSocketServer, WebSocket } from "ws";
 
 import { Tool } from "./interfaces/Tool.js";
 import { HelloWorldTool } from "./tools/HelloWorldTool.js";
@@ -16,6 +17,8 @@ import { HelloWorldTool } from "./tools/HelloWorldTool.js";
 class PenpotMcpServer {
     private readonly server: Server;
     private readonly tools: Map<string, Tool>;
+    private readonly wsServer: WebSocketServer;
+    private readonly connectedClients: Set<WebSocket> = new Set();
 
     /**
      * Creates a new Penpot MCP server instance.
@@ -30,7 +33,9 @@ class PenpotMcpServer {
         });
 
         this.tools = new Map<string, Tool>();
+        this.wsServer = new WebSocketServer({ port: 8080 });
         this.setupHandlers();
+        this.setupWebSocketHandlers();
         this.registerTools();
     }
 
@@ -81,6 +86,37 @@ class PenpotMcpServer {
     }
 
     /**
+     * Sets up WebSocket connection handlers for plugin communication.
+     *
+     * Manages client connections and provides bidirectional communication
+     * channel between the MCP server and Penpot plugin instances.
+     */
+    private setupWebSocketHandlers(): void {
+        this.wsServer.on("connection", (ws: WebSocket) => {
+            console.error("New WebSocket connection established");
+            this.connectedClients.add(ws);
+
+            ws.on("message", (data: Buffer) => {
+                console.error("Received WebSocket message:", data.toString());
+                // Protocol will be defined later
+            });
+
+            ws.on("close", () => {
+                console.error("WebSocket connection closed");
+                this.connectedClients.delete(ws);
+            });
+
+            ws.on("error", (error) => {
+                console.error("WebSocket connection error:", error);
+                this.connectedClients.delete(ws);
+            });
+        });
+
+        console.error("WebSocket server started on port 8080");
+    }
+
+
+    /**
      * Starts the MCP server using stdio transport.
      *
      * This method establishes the communication channel and begins
@@ -90,6 +126,7 @@ class PenpotMcpServer {
         const transport = new StdioServerTransport();
         await this.server.connect(transport);
         console.error("Penpot MCP Server started successfully");
+        console.error("WebSocket server is listening on ws://localhost:8080");
     }
 }
 

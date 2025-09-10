@@ -22,10 +22,12 @@
         "@modelcontextprotocol/sdk": "^0.4.0",
         "class-validator": "^0.14.0",
         "class-transformer": "^0.5.1",
-        "reflect-metadata": "^0.1.13"
+        "reflect-metadata": "^0.1.13",
+        "ws": "^8.18.0"
     },
     "devDependencies": {
         "@types/node": "^20.0.0",
+        "@types/ws": "^8.5.10",
         "prettier": "^3.0.0",
         "ts-node": "^10.9.0",
         "typescript": "^5.0.0"
