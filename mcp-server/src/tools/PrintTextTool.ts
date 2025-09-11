@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { TypeSafeTool } from "../interfaces/Tool.js";
+import { Tool } from "../interfaces/Tool.js";
 import { PluginTaskPrintText, PluginTaskPrintTextParams } from "../interfaces/PluginTask.js";
 import type { ToolResponse } from "../interfaces/ToolResponse.js";
 import { TextResponse } from "../interfaces/ToolResponse.js";
@@ -23,7 +23,7 @@ export class PrintTextArgs {
  * This tool sends a PluginTaskPrintText to connected plugin instances,
  * instructing them to create and position text elements in the canvas.
  */
-export class ToolPrintText extends TypeSafeTool<PrintTextArgs> {
+export class PrintTextTool extends Tool<PrintTextArgs> {
     private connectedClients: Set<any>; // WebSocket clients
 
     /**
@@ -52,7 +52,7 @@ export class ToolPrintText extends TypeSafeTool<PrintTextArgs> {
      *
      * @param args - The validated PrintTextArgs instance
      */
-    protected async executeTypeSafe(args: PrintTextArgs): Promise<ToolResponse> {
+    protected async executeCore(args: PrintTextArgs): Promise<ToolResponse> {
         try {
             // Create the plugin task
             const taskParams = new PluginTaskPrintTextParams(args.text);

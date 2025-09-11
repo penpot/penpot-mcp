@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { TypeSafeTool } from "../interfaces/Tool.js";
+import { Tool } from "../interfaces/Tool.js";
 import "reflect-metadata";
 import type { ToolResponse } from "../interfaces/ToolResponse.js";
 import { TextResponse } from "../interfaces/ToolResponse.js";
@@ -22,7 +22,7 @@ export class HelloWorldArgs {
  * This tool directly implements the Tool interface while maintaining full
  * type safety through the protected executeTypeSafe method.
  */
-export class HelloWorldTool extends TypeSafeTool<HelloWorldArgs> {
+export class HelloWorldTool extends Tool<HelloWorldArgs> {
     constructor() {
         super(HelloWorldArgs);
     }
@@ -43,7 +43,7 @@ export class HelloWorldTool extends TypeSafeTool<HelloWorldArgs> {
      *
      * @param args - The validated HelloWorldArgs instance
      */
-    protected async executeTypeSafe(args: HelloWorldArgs): Promise<ToolResponse> {
+    protected async executeCore(args: HelloWorldArgs): Promise<ToolResponse> {
         return new TextResponse(
             `Hello, ${args.name}! This greeting was generated with full type safety and automatic validation.`
         );

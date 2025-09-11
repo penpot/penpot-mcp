@@ -22,9 +22,9 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { WebSocketServer, WebSocket } from "ws";
 
-import { Tool } from "./interfaces/Tool.js";
+import { ToolInterface } from "./interfaces/Tool.js";
 import { HelloWorldTool } from "./tools/HelloWorldTool.js";
-import { ToolPrintText } from "./tools/ToolPrintText.js";
+import { PrintTextTool } from "./tools/PrintTextTool";
 
 /**
  * Main MCP server implementation for Penpot integration.
@@ -34,7 +34,7 @@ import { ToolPrintText } from "./tools/ToolPrintText.js";
  */
 class PenpotMcpServer {
     private readonly server: Server;
-    private readonly tools: Map<string, Tool>;
+    private readonly tools: Map<string, ToolInterface>;
     private readonly wsServer: WebSocketServer;
     private readonly connectedClients: Set<WebSocket> = new Set();
     private app: any; // Express app
@@ -65,7 +65,7 @@ class PenpotMcpServer {
             }
         );
 
-        this.tools = new Map<string, Tool>();
+        this.tools = new Map<string, ToolInterface>();
         this.wsServer = new WebSocketServer({ port: 8080 });
 
         this.setupMcpHandlers();
@@ -80,7 +80,7 @@ class PenpotMcpServer {
      * the internal registry for later execution.
      */
     private registerTools(): void {
-        const toolInstances: Tool[] = [new HelloWorldTool(), new ToolPrintText(this.connectedClients)];
+        const toolInstances: ToolInterface[] = [new HelloWorldTool(), new PrintTextTool(this.connectedClients)];
 
         for (const tool of toolInstances) {
             this.tools.set(tool.definition.name, tool);

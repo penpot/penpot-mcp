@@ -5,12 +5,12 @@ import "reflect-metadata";
 import { ToolResponse } from "./ToolResponse";
 
 /**
- * Defines the contract for MCP tool implementations.
+ * Base interface for MCP tool implementations.
  *
- * This interface maintains compatibility with the MCP protocol while
- * supporting both type-safe and traditional implementations.
+ * This interface maintains compatibility with the MCP protocol.
+ * Most implementations should extend the Tool abstract class instead.
  */
-export interface Tool {
+export interface ToolInterface {
     /**
      * The tool's unique identifier and metadata definition.
      */
@@ -37,12 +37,12 @@ interface PropertyMetadata {
 /**
  * Base class for type-safe tools with automatic schema generation and validation.
  *
- * This class directly implements the Tool interface while providing type safety
- * through automatic validation and strongly-typed protected methods.
+ * This class provides type safety through automatic validation and strongly-typed
+ * protected methods. All tools should extend this class.
  *
  * @template TArgs - The strongly-typed arguments class for this tool
  */
-export abstract class TypeSafeTool<TArgs extends object> implements Tool {
+export abstract class Tool<TArgs extends object> implements ToolInterface {
     private _definition: MCPTool | undefined;
 
     constructor(private ArgsClass: new () => TArgs) {}
@@ -81,7 +81,7 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
             }
 
             // Call the type-safe implementation
-            return await this.executeTypeSafe(argsInstance);
+            return await this.executeCore(argsInstance);
         } catch (error) {
             if (error instanceof Error) {
                 throw error;
@@ -201,12 +201,9 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
     protected abstract getToolDescription(): string;
 
     /**
-     * Executes the tool with strongly-typed, pre-validated arguments.
+     * Executes the tool's core logic.
      *
-     * This method receives fully validated and typed arguments, providing
-     * complete type safety without any casting or manual validation.
-     *
-     * @param args - The validated, strongly-typed arguments
+     * @param args - The (typed) tool arguments
      */
-    protected abstract executeTypeSafe(args: TArgs): Promise<ToolResponse>;
+    protected abstract executeCore(args: TArgs): Promise<ToolResponse>;
 }
