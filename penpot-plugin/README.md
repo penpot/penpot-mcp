@@ -39,17 +39,11 @@ The `manifest.json` file contains the basic information about the plugin. It def
 
 ```json
 {
-  "name": "Your plugin name",
-  "description": "Your plugin description",
-  "code": "plugin-file.js",
-  "icon": "your-icon.png",
-  "permissions": [
-    "content:read",
-    "content:write",
-    "library:read",
-    "library:write",
-    "user:read"
-  ]
+    "name": "Your plugin name",
+    "description": "Your plugin description",
+    "code": "plugin-file.js",
+    "icon": "your-icon.png",
+    "permissions": ["content:read", "content:write", "library:read", "library:write", "user:read"]
 }
 ```
 

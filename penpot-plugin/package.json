@@ -1,22 +1,22 @@
 {
-  "name": "penpot-plugin-starter-template",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite build --watch",
-    "build": "tsc && vite build",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
-  },
-  "dependencies": {
-    "@penpot/plugin-styles": "1.3.2",
-    "@penpot/plugin-types": "1.3.2"
-  },
-  "devDependencies": {
-    "prettier": "^3.0.0",
-    "typescript": "^5.8.3",
-    "vite": "^7.0.5",
-    "vite-live-preview": "^0.3.2"
-  }
+    "name": "penpot-plugin-starter-template",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite build --watch",
+        "build": "tsc && vite build",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "dependencies": {
+        "@penpot/plugin-styles": "1.3.2",
+        "@penpot/plugin-types": "1.3.2"
+    },
+    "devDependencies": {
+        "prettier": "^3.0.0",
+        "typescript": "^5.8.3",
+        "vite": "^7.0.5",
+        "vite-live-preview": "^0.3.2"
+    }
 }
