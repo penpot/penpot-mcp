@@ -130,10 +130,7 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
         propertyNames.push(...Object.getOwnPropertyNames(prototype));
 
         return propertyNames.filter(
-            (name) =>
-                name !== "constructor" &&
-                !name.startsWith("_") &&
-                typeof (instance as any)[name] !== "function"
+            (name) => name !== "constructor" && !name.startsWith("_") && typeof (instance as any)[name] !== "function"
         );
     }
 
@@ -210,7 +207,5 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
      *
      * @param args - The validated, strongly-typed arguments
      */
-    protected abstract executeTypeSafe(
-        args: TArgs
-    ): Promise<{ content: Array<{ type: string; text: string }> }>;
+    protected abstract executeTypeSafe(args: TArgs): Promise<{ content: Array<{ type: string; text: string }> }>;
 }

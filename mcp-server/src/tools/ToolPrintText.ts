@@ -50,9 +50,7 @@ export class ToolPrintText extends TypeSafeTool<PrintTextArgs> {
      *
      * @param args - The validated PrintTextArgs instance
      */
-    protected async executeTypeSafe(
-        args: PrintTextArgs
-    ): Promise<{ content: Array<{ type: string; text: string }> }> {
+    protected async executeTypeSafe(args: PrintTextArgs): Promise<{ content: Array<{ type: string; text: string }> }> {
         try {
             // Create the plugin task
             const taskParams = new PluginTaskPrintTextParams(args.text);

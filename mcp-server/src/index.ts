@@ -80,10 +80,7 @@ class PenpotMcpServer {
      * the internal registry for later execution.
      */
     private registerTools(): void {
-        const toolInstances: Tool[] = [
-            new HelloWorldTool(),
-            new ToolPrintText(this.connectedClients),
-        ];
+        const toolInstances: Tool[] = [new HelloWorldTool(), new ToolPrintText(this.connectedClients)];
 
         for (const tool of toolInstances) {
             this.tools.set(tool.definition.name, tool);
@@ -150,9 +147,7 @@ class PenpotMcpServer {
      * streamable HTTP transport protocol.
      */
     private async handleStreamableHttpRequest(req: any, res: any): Promise<void> {
-        const { StreamableHTTPServerTransport } = await import(
-            "@modelcontextprotocol/sdk/server/streamableHttp.js"
-        );
+        const { StreamableHTTPServerTransport } = await import("@modelcontextprotocol/sdk/server/streamableHttp.js");
         const { randomUUID } = await import("node:crypto");
         const { isInitializeRequest } = await import("@modelcontextprotocol/sdk/types.js");
 
@@ -321,9 +316,7 @@ async function main(): Promise<void> {
             } else if (args[i] === "--help" || args[i] === "-h") {
                 console.log("Usage: node dist/index.js [options]");
                 console.log("Options:");
-                console.log(
-                    "  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)"
-                );
+                console.log("  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)");
                 console.log("  --help, -h             Show this help message");
                 process.exit(0);
             }
