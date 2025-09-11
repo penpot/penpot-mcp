@@ -19,7 +19,7 @@
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { WebSocketServer, WebSocket } from "ws";
 
 import { Tool } from "./interfaces/Tool.js";
@@ -100,7 +100,7 @@ class PenpotMcpServer {
             };
         });
 
-        this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+        this.server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToolResult> => {
             const { name, arguments: args } = request.params;
 
             const tool = this.tools.get(name);

@@ -1,6 +1,8 @@
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 import { TypeSafeTool } from "../interfaces/Tool.js";
 import { PluginTaskPrintText, PluginTaskPrintTextParams } from "../interfaces/PluginTask.js";
+import type { ToolResponse } from "../interfaces/ToolResponse.js";
+import { TextResponse } from "../interfaces/ToolResponse.js";
 import "reflect-metadata";
 
 /**
@@ -50,7 +52,7 @@ export class ToolPrintText extends TypeSafeTool<PrintTextArgs> {
      *
      * @param args - The validated PrintTextArgs instance
      */
-    protected async executeTypeSafe(args: PrintTextArgs): Promise<{ content: Array<{ type: string; text: string }> }> {
+    protected async executeTypeSafe(args: PrintTextArgs): Promise<ToolResponse> {
         try {
             // Create the plugin task
             const taskParams = new PluginTaskPrintTextParams(args.text);
@@ -58,14 +60,9 @@ export class ToolPrintText extends TypeSafeTool<PrintTextArgs> {
 
             // Check if there are connected clients
             if (this.connectedClients.size === 0) {
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: `No Penpot plugin instances are currently connected. Please ensure the plugin is running and connected.`,
-                        },
-                    ],
-                };
+                return new TextResponse(
+                    `No Penpot plugin instances are currently connected. Please ensure the plugin is running and connected.`
+                );
             }
 
             // Send task to all connected clients
@@ -81,34 +78,17 @@ export class ToolPrintText extends TypeSafeTool<PrintTextArgs> {
             });
 
             if (sentCount === 0) {
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: `All connected plugin instances appear to be disconnected. No text was created.`,
-                        },
-                    ],
-                };
+                return new TextResponse(
+                    `All connected plugin instances appear to be disconnected. No text was created.`
+                );
             }
 
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: `Successfully sent text creation task to ${sentCount} connected plugin instance(s). Text "${args.text}" should now appear in Penpot.`,
-                    },
-                ],
-            };
+            return new TextResponse(
+                `Successfully sent text creation task to ${sentCount} connected plugin instance(s). Text "${args.text}" should now appear in Penpot.`
+            );
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: `Failed to create text in Penpot: ${errorMessage}`,
-                    },
-                ],
-            };
+            return new TextResponse(`Failed to create text in Penpot: ${errorMessage}`);
         }
     }
 }

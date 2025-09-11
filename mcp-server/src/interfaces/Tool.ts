@@ -2,6 +2,7 @@ import { Tool as MCPTool } from "@modelcontextprotocol/sdk/types.js";
 import { validate, ValidationError } from "class-validator";
 import { plainToClass } from "class-transformer";
 import "reflect-metadata";
+import { ToolResponse } from "./ToolResponse";
 
 /**
  * Defines the contract for MCP tool implementations.
@@ -21,7 +22,7 @@ export interface Tool {
      * @param args - The arguments passed to the tool (validated by implementation)
      * @returns A promise that resolves to the tool's execution result
      */
-    execute(args: unknown): Promise<{ content: Array<{ type: string; text: string }> }>;
+    execute(args: unknown): Promise<ToolResponse>;
 }
 
 /**
@@ -66,7 +67,7 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
      * This method handles the unknown args from the MCP protocol,
      * validates them, and delegates to the type-safe implementation.
      */
-    async execute(args: unknown): Promise<{ content: Array<{ type: string; text: string }> }> {
+    async execute(args: unknown): Promise<ToolResponse> {
         try {
             // Transform plain object to class instance
             const argsInstance = plainToClass(this.ArgsClass, args as object);
@@ -207,5 +208,5 @@ export abstract class TypeSafeTool<TArgs extends object> implements Tool {
      *
      * @param args - The validated, strongly-typed arguments
      */
-    protected abstract executeTypeSafe(args: TArgs): Promise<{ content: Array<{ type: string; text: string }> }>;
+    protected abstract executeTypeSafe(args: TArgs): Promise<ToolResponse>;
 }
