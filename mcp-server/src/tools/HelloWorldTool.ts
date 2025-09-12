@@ -3,6 +3,7 @@ import { Tool } from "../interfaces/Tool.js";
 import "reflect-metadata";
 import type { ToolResponse } from "../interfaces/ToolResponse.js";
 import { TextResponse } from "../interfaces/ToolResponse.js";
+import { PenpotMcpServer } from "../index";
 
 /**
  * Arguments class for the HelloWorld tool with validation decorators.
@@ -23,8 +24,11 @@ export class HelloWorldArgs {
  * type safety through the protected executeTypeSafe method.
  */
 export class HelloWorldTool extends Tool<HelloWorldArgs> {
-    constructor() {
-        super(HelloWorldArgs);
+    /**
+     * @param mcpServer - The MCP server instance
+     */
+    constructor(mcpServer: PenpotMcpServer) {
+        super(mcpServer, HelloWorldArgs);
     }
 
     protected getToolName(): string {

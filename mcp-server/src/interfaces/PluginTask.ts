@@ -6,7 +6,7 @@
  *
  * @template TParams - The strongly-typed parameters for this task
  */
-export abstract class PluginTask<TParams = any> {
+export abstract class PluginTask<TParams = any, TResult = any> {
     /**
      * The name of the task to execute on the plugin side.
      */
@@ -17,6 +17,8 @@ export abstract class PluginTask<TParams = any> {
      */
     public readonly params: TParams;
 
+    private result?: Promise<TResult> = undefined;
+
     /**
      * Creates a new plugin task instance.
      *
@@ -26,6 +28,17 @@ export abstract class PluginTask<TParams = any> {
     constructor(task: string, params: TParams) {
         this.task = task;
         this.params = params;
+    }
+
+    /**
+     * Sets the result promise for this task.
+     *
+     * This can be used to track the outcome of the task execution.
+     *
+     * @param resultPromise - A promise that resolves to the task result
+     */
+    setResult(resultPromise: Promise<TResult>): void {
+        this.result = resultPromise;
     }
 
     /**

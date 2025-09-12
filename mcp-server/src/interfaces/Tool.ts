@@ -2,7 +2,8 @@ import { Tool as MCPTool } from "@modelcontextprotocol/sdk/types.js";
 import { validate, ValidationError } from "class-validator";
 import { plainToClass } from "class-transformer";
 import "reflect-metadata";
-import { ToolResponse } from "./ToolResponse";
+import { TextResponse, ToolResponse } from "./ToolResponse.js";
+import type { PenpotMcpServer } from "../index.js";
 
 /**
  * Base interface for MCP tool implementations.
@@ -45,7 +46,10 @@ interface PropertyMetadata {
 export abstract class Tool<TArgs extends object> implements ToolInterface {
     private _definition: MCPTool | undefined;
 
-    constructor(private ArgsClass: new () => TArgs) {}
+    protected constructor(
+        protected mcpServer: PenpotMcpServer,
+        private ArgsClass: new () => TArgs
+    ) {}
 
     /**
      * Gets the tool definition with automatically generated JSON schema.
@@ -69,24 +73,20 @@ export abstract class Tool<TArgs extends object> implements ToolInterface {
      */
     async execute(args: unknown): Promise<ToolResponse> {
         try {
-            // Transform plain object to class instance
+            // transform plain object to class instance
             const argsInstance = plainToClass(this.ArgsClass, args as object);
 
-            // Validate using class-validator decorators
+            // validate using class-validator decorators
             const errors = await validate(argsInstance);
-
             if (errors.length > 0) {
                 const errorMessages = this.formatValidationErrors(errors);
                 throw new Error(`Validation failed: ${errorMessages.join(", ")}`);
             }
 
-            // Call the type-safe implementation
+            // execute the actual tool logic
             return await this.executeCore(argsInstance);
         } catch (error) {
-            if (error instanceof Error) {
-                throw error;
-            }
-            throw new Error(`Tool execution failed: ${String(error)}`);
+            return new TextResponse(`Tool execution failed: ${String(error)}`);
         }
     }
 

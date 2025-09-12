@@ -20,11 +20,12 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocket, WebSocketServer } from "ws";
 
 import { ToolInterface } from "./interfaces/Tool.js";
 import { HelloWorldTool } from "./tools/HelloWorldTool.js";
-import { PrintTextTool } from "./tools/PrintTextTool";
+import { PrintTextTool } from "./tools/PrintTextTool.js";
+import { PluginTask } from "./interfaces/PluginTask.js";
 
 /**
  * Main MCP server implementation for Penpot integration.
@@ -32,7 +33,7 @@ import { PrintTextTool } from "./tools/PrintTextTool";
  * This server manages tool registration and execution using a clean
  * abstraction pattern that allows for easy extension with new tools.
  */
-class PenpotMcpServer {
+export class PenpotMcpServer {
     private readonly server: Server;
     private readonly tools: Map<string, ToolInterface>;
     private readonly wsServer: WebSocketServer;
@@ -80,7 +81,7 @@ class PenpotMcpServer {
      * the internal registry for later execution.
      */
     private registerTools(): void {
-        const toolInstances: ToolInterface[] = [new HelloWorldTool(), new PrintTextTool(this.connectedClients)];
+        const toolInstances: ToolInterface[] = [new HelloWorldTool(this), new PrintTextTool(this)];
 
         for (const tool of toolInstances) {
             this.tools.set(tool.definition.name, tool);
@@ -263,6 +264,29 @@ class PenpotMcpServer {
         });
 
         console.error("WebSocket server started on port 8080");
+    }
+
+    public executePluginTask(task: PluginTask) {
+        // Check if there are connected clients
+        if (this.connectedClients.size === 0) {
+            throw new Error(
+                `No Penpot plugin instances are currently connected. Please ensure the plugin is running and connected.`
+            );
+        }
+
+        // Send task to all connected clients
+        const taskMessage = JSON.stringify(task.toJSON());
+        let sentCount = 0;
+        this.connectedClients.forEach((client) => {
+            if (client.readyState === 1) {
+                // WebSocket.OPEN
+                client.send(taskMessage);
+                sentCount++;
+            }
+        });
+        if (sentCount === 0) {
+            throw new Error(`All connected plugin instances appear to be disconnected. No text was created.`);
+        }
     }
 
     /**
