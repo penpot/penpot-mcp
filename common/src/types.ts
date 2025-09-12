@@ -3,21 +3,11 @@
  * 
  * Contains the outcome status of a task and any additional result data.
  */
-export interface PluginTaskResult {
-    /**
-     * Whether the task completed successfully.
-     */
-    success: boolean;
-    
-    /**
-     * Optional error message if the task failed.
-     */
-    error?: string;
-    
+export interface PluginTaskResult<T> {
     /**
      * Optional result data from the task execution.
      */
-    data?: any;
+    data?: T;
 }
 
 /**
@@ -47,16 +37,26 @@ export interface PluginTaskRequest {
  * 
  * Contains the original request ID and the execution result.
  */
-export interface PluginTaskResponse {
+export interface PluginTaskResponse<T> {
     /**
      * Unique identifier matching the original request.
      */
     id: string;
-    
+
+    /**
+     * Whether the task completed successfully.
+     */
+    success: boolean;
+
+    /**
+     * Optional error message if the task failed.
+     */
+    error?: string;
+
     /**
      * The result of the task execution.
      */
-    result: PluginTaskResult;
+    data?: T;
 }
 
 /**

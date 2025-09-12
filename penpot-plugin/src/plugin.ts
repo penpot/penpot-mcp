@@ -38,10 +38,7 @@ function handlePluginTaskRequest(request: { id: string; task: string; params: an
 
         default:
             console.warn("Unknown plugin task:", request.task);
-            sendTaskResponse(request.id, {
-                success: false,
-                error: `Unknown task type: ${request.task}`,
-            });
+            sendTaskError(request.id, `Unknown task type: ${request.task}`);
     }
 }
 
@@ -54,10 +51,7 @@ function handlePluginTaskRequest(request: { id: string; task: string; params: an
 function handlePrintTextTask(taskId: string, params: { text: string }): void {
     if (!params.text) {
         console.error("printText task requires 'text' parameter");
-        sendTaskResponse(taskId, {
-            success: false,
-            error: "printText task requires 'text' parameter",
-        });
+        sendTaskError(taskId, "printText task requires 'text' parameter");
         return;
     }
 
@@ -73,45 +67,43 @@ function handlePrintTextTask(taskId: string, params: { text: string }): void {
             penpot.selection = [text];
 
             console.log("Successfully created text:", params.text);
-            sendTaskResponse(taskId, {
-                success: true,
-                data: { textId: text.id },
-            });
+            sendTaskSuccess(taskId, { textId: text.id });
         } else {
             console.error("Failed to create text element");
-            sendTaskResponse(taskId, {
-                success: false,
-                error: "Failed to create text element",
-            });
+            sendTaskError(taskId, "Failed to create text element");
         }
     } catch (error) {
         console.error("Error creating text:", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        sendTaskResponse(taskId, {
-            success: false,
-            error: `Error creating text: ${errorMessage}`,
-        });
+        sendTaskError(taskId, `Error creating text: ${errorMessage}`);
     }
 }
 
 /**
  * Sends a task response back to the MCP server.
- *
- * @param taskId - The unique ID of the original task request
- * @param result - The task execution result
  */
-function sendTaskResponse(taskId: string, result: { success: boolean; error?: string; data?: any }): void {
+function sendTaskResponse(taskId: string, success: boolean, data: any = undefined, error: any = undefined): void {
     const response = {
         type: "task-response",
         response: {
             id: taskId,
-            result: result,
+            success: success,
+            data: data,
+            error: error,
         },
     };
 
     // Send to main.ts which will forward to MCP server via WebSocket
     penpot.ui.sendMessage(response);
     console.log("Sent task response:", response);
+}
+
+function sendTaskSuccess(taskId: string, data: any = undefined): void {
+    sendTaskResponse(taskId, true, data);
+}
+
+function sendTaskError(taskId: string, error: string): void {
+    sendTaskResponse(taskId, false, undefined, error);
 }
 
 // Update the theme in the iframe

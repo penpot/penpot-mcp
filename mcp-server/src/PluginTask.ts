@@ -37,7 +37,7 @@ export abstract class PluginTask<TParams = any, TResult extends PluginTaskResult
     /**
      * Promise that resolves when the task execution completes.
      */
-    private result?: Promise<TResult>;
+    private readonly result: Promise<TResult>;
 
     /**
      * Resolver function for the result promise.
@@ -59,16 +59,6 @@ export abstract class PluginTask<TParams = any, TResult extends PluginTaskResult
         this.id = randomUUID();
         this.task = task;
         this.params = params;
-        this.setupResultPromise();
-    }
-
-    /**
-     * Sets up the result promise and its resolvers.
-     *
-     * Creates a promise that can be resolved externally when
-     * the task result is received from the plugin.
-     */
-    private setupResultPromise(): void {
         this.result = new Promise<TResult>((resolve, reject) => {
             this.resolveResult = resolve;
             this.rejectResult = reject;

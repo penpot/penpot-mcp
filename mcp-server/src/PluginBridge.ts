@@ -11,7 +11,10 @@ export class PluginBridge {
     private readonly pendingTasks: Map<string, PluginTask<any, any>> = new Map();
     private readonly taskTimeouts: Map<string, NodeJS.Timeout> = new Map();
 
-    constructor(port: number) {
+    constructor(
+        port: number,
+        private taskTimeoutSecs: number = 30
+    ) {
         this.wsServer = new WebSocketServer({ port: port });
         this.setupWebSocketHandlers();
     }
@@ -30,7 +33,7 @@ export class PluginBridge {
             ws.on("message", (data: Buffer) => {
                 console.error("Received WebSocket message:", data.toString());
                 try {
-                    const response: PluginTaskResponse = JSON.parse(data.toString());
+                    const response: PluginTaskResponse<any> = JSON.parse(data.toString());
                     this.handlePluginTaskResponse(response);
                 } catch (error) {
                     console.error("Failed to parse WebSocket message:", error);
@@ -59,7 +62,7 @@ export class PluginBridge {
      *
      * @param response - The plugin task response containing ID and result
      */
-    private handlePluginTaskResponse(response: PluginTaskResponse): void {
+    private handlePluginTaskResponse(response: PluginTaskResponse<any>): void {
         const task = this.pendingTasks.get(response.id);
         if (!task) {
             console.error(`Received response for unknown task ID: ${response.id}`);
@@ -75,14 +78,14 @@ export class PluginBridge {
         this.pendingTasks.delete(response.id);
 
         // Resolve or reject the task's promise based on the result
-        if (response.result.success) {
-            task.resolveWithResult(response.result);
+        if (response.success) {
+            task.resolveWithResult({ data: response.data });
         } else {
-            const error = new Error(response.result.error || "Task execution failed");
+            const error = new Error(response.error || "Task execution failed (details not provided)");
             task.rejectWithError(error);
         }
 
-        console.error(`Task ${response.id} completed with success: ${response.result.success}`);
+        console.error(`Task ${response.id} completed: success=${response.success}`);
     }
 
     /**
@@ -94,7 +97,7 @@ export class PluginBridge {
      * @param task - The plugin task to execute
      * @throws Error if no plugin instances are connected or available
      */
-    public async executePluginTask<TResult extends PluginTaskResult>(task: PluginTask<any, TResult>): Promise<void> {
+    public async executePluginTask<TResult>(task: PluginTask<any, TResult>): Promise<TResult> {
         // Check if there are connected clients
         if (this.connectedClients.size === 0) {
             throw new Error(
@@ -105,7 +108,7 @@ export class PluginBridge {
         // Register the task for result correlation
         this.pendingTasks.set(task.id, task);
 
-        // Send task to all connected clients using the new request format
+        // Send task to all connected clients
         const requestMessage = JSON.stringify(task.toRequest());
         let sentCount = 0;
         this.connectedClients.forEach((client) => {
@@ -133,11 +136,15 @@ export class PluginBridge {
             if (pendingTask) {
                 this.pendingTasks.delete(task.id);
                 this.taskTimeouts.delete(task.id);
-                pendingTask.rejectWithError(new Error(`Task ${task.id} timed out after 30 seconds`));
+                pendingTask.rejectWithError(
+                    new Error(`Task ${task.id} timed out after ${this.taskTimeoutSecs} seconds`)
+                );
             }
-        }, 30000);
+        }, this.taskTimeoutSecs * 1000);
 
         this.taskTimeouts.set(task.id, timeoutHandle);
         console.error(`Sent task ${task.id} to ${sentCount} connected clients`);
+
+        return await task.getResultPromise();
     }
 }

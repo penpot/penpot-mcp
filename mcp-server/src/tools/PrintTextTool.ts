@@ -46,19 +46,7 @@ export class PrintTextTool extends Tool<PrintTextArgs> {
     protected async executeCore(args: PrintTextArgs): Promise<ToolResponse> {
         const taskParams: PrintTextTaskParams = { text: args.text };
         const task = new PrintTextPluginTask(taskParams);
-
-        try {
-            await this.mcpServer.pluginBridge.executePluginTask(task);
-            const result = await task.getResultPromise();
-
-            if (result.success) {
-                return new TextResponse(`Successfully created text "${args.text}" in Penpot.`);
-            } else {
-                return new TextResponse(`Failed to create text in Penpot: ${result.error || "Unknown error"}`);
-            }
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            return new TextResponse(`Failed to execute text creation task: ${errorMessage}`);
-        }
+        await this.mcpServer.pluginBridge.executePluginTask(task);
+        return new TextResponse(`Successfully created text "${args.text}" in Penpot.`);
     }
 }
