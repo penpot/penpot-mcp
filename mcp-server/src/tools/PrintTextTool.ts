@@ -48,7 +48,7 @@ export class PrintTextTool extends Tool<PrintTextArgs> {
         const task = new PrintTextPluginTask(taskParams);
 
         try {
-            await this.mcpServer.executePluginTask(task);
+            await this.mcpServer.pluginBridge.executePluginTask(task);
             const result = await task.getResultPromise();
 
             if (result.success) {
