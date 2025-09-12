@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { PenpotMcpServer } from "./PenpotMcpServer.js";
+import { PenpotMcpServer } from "./PenpotMcpServer";
 
 /**
  * Entry point for Penpot MCP Server

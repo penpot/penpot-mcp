@@ -5,7 +5,7 @@
 ### 1. Build and Test
 ```bash
 cd mcp-server
-npm run build
+npm run build:full  # or npm run build for faster bundling only
 ```
 
 ### 2. Verify TypeScript Compilation
@@ -23,7 +23,7 @@ npm run dev
 - Ensure all code follows the established conventions
 - Verify JSDoc comments are complete and accurate
 - Check that error handling is appropriate
-- Ensure imports use correct .js extensions
+- Use clean imports WITHOUT file extensions (esbuild handles resolution)
 - Validate that tool interfaces are properly implemented
 
 ### 5. Integration Testing
@@ -32,7 +32,7 @@ npm run dev
 - Ensure tool definitions match implementation
 
 ## Before Committing Changes
-1. **Build Successfully**: `npm run build` completes without errors
+1. **Build Successfully**: `npm run build:full` completes without errors
 2. **No TypeScript Errors**: `npx tsc --noEmit` passes
 3. **Documentation Updated**: JSDoc comments reflect changes
 4. **Tool Registry Updated**: New tools added to `registerTools()` method
@@ -49,4 +49,9 @@ npm run dev
 - Use readonly properties for tool definitions
 - Include comprehensive error handling
 - Follow the established documentation style
-- Import with .js extensions for ES module compatibility
+- Import WITHOUT file extensions (esbuild resolves them automatically)
+
+## Build System
+- Uses esbuild for fast bundling and TypeScript for declarations
+- Import statements should omit file extensions entirely
+- IDE refactoring is safe - no extension-related build failures

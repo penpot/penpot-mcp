@@ -5,9 +5,9 @@ import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from "@
 import { WebSocket, WebSocketServer } from "ws";
 
 import { ToolInterface } from "./Tool";
-import { HelloWorldTool } from "./tools/HelloWorldTool.js";
-import { PrintTextTool } from "./tools/PrintTextTool.js";
-import { PluginTask } from "./PluginTask.js";
+import { HelloWorldTool } from "./tools/HelloWorldTool";
+import { PrintTextTool } from "./tools/PrintTextTool";
+import { PluginTask } from "./PluginTask";
 
 /**
  * Penpot MCP server implementation with HTTP and SSE Transport Support

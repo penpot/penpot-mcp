@@ -1,10 +1,10 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { Tool } from "../Tool.js";
-import { PluginTaskPrintText, PluginTaskPrintTextParams } from "../PluginTask.js";
-import type { ToolResponse } from "../ToolResponse.js";
-import { TextResponse } from "../ToolResponse.js";
+import { Tool } from "../Tool";
+import { PluginTaskPrintText, PluginTaskPrintTextParams } from "../PluginTask";
+import type { ToolResponse } from "../ToolResponse";
+import { TextResponse } from "../ToolResponse";
 import "reflect-metadata";
-import { PenpotMcpServer } from "../PenpotMcpServer.js";
+import { PenpotMcpServer } from "../PenpotMcpServer";
 
 /**
  * Arguments class for the PrintText tool with validation decorators.

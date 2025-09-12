@@ -2,8 +2,8 @@ import { Tool as MCPTool } from "@modelcontextprotocol/sdk/types.js";
 import { validate, ValidationError } from "class-validator";
 import { plainToClass } from "class-transformer";
 import "reflect-metadata";
-import { TextResponse, ToolResponse } from "./ToolResponse.js";
-import type { PenpotMcpServer } from "./PenpotMcpServer.js";
+import { TextResponse, ToolResponse } from "./ToolResponse";
+import type { PenpotMcpServer } from "./PenpotMcpServer";
 
 /**
  * Base interface for MCP tool implementations.
