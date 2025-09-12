@@ -6,8 +6,8 @@
  *
  * @template TParams - The strongly-typed parameters for this task
  */
-import { PluginTaskRequest, PluginTaskResult } from '@penpot-mcp/common';
-import { randomUUID } from 'crypto';
+import { PluginTaskRequest, PluginTaskResult } from "@penpot-mcp/common";
+import { randomUUID } from "crypto";
 
 /**
  * Base class for plugin tasks that are sent over WebSocket.
@@ -64,7 +64,7 @@ export abstract class PluginTask<TParams = any, TResult extends PluginTaskResult
 
     /**
      * Sets up the result promise and its resolvers.
-     * 
+     *
      * Creates a promise that can be resolved externally when
      * the task result is received from the plugin.
      */
@@ -77,49 +77,49 @@ export abstract class PluginTask<TParams = any, TResult extends PluginTaskResult
 
     /**
      * Gets the result promise for this task.
-     * 
+     *
      * @returns Promise that resolves when the task execution completes
      */
     getResultPromise(): Promise<TResult> {
         if (!this.result) {
-            throw new Error('Result promise not initialized');
+            throw new Error("Result promise not initialized");
         }
         return this.result;
     }
 
     /**
      * Resolves the task with the given result.
-     * 
+     *
      * This method should be called when a task response is received
      * from the plugin with matching ID.
-     * 
+     *
      * @param result - The task execution result
      */
     resolveWithResult(result: TResult): void {
         if (!this.resolveResult) {
-            throw new Error('Result promise not initialized');
+            throw new Error("Result promise not initialized");
         }
         this.resolveResult(result);
     }
 
     /**
      * Rejects the task with the given error.
-     * 
+     *
      * This method should be called when task execution fails
      * or times out.
-     * 
+     *
      * @param error - The error that occurred during task execution
      */
     rejectWithError(error: Error): void {
         if (!this.rejectResult) {
-            throw new Error('Result promise not initialized');
+            throw new Error("Result promise not initialized");
         }
         this.rejectResult(error);
     }
 
     /**
      * Serializes the task to a request message for WebSocket transmission.
-     * 
+     *
      * @returns The request message containing ID, task name, and parameters
      */
     toRequest(): PluginTaskRequest {

@@ -1,5 +1,5 @@
 import { PluginTask } from "../PluginTask";
-import { PrintTextTaskParams, PluginTaskResult } from '@penpot-mcp/common';
+import { PrintTextTaskParams, PluginTaskResult } from "@penpot-mcp/common";
 
 /**
  * Task for printing/creating text in Penpot.

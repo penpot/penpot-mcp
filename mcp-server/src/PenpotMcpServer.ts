@@ -8,7 +8,7 @@ import { ToolInterface } from "./Tool";
 import { HelloWorldTool } from "./tools/HelloWorldTool";
 import { PrintTextTool } from "./tools/PrintTextTool";
 import { PluginTask } from "./PluginTask";
-import { PluginTaskResponse, PluginTaskResult } from '@penpot-mcp/common';
+import { PluginTaskResponse, PluginTaskResult } from "@penpot-mcp/common";
 
 /**
  * Penpot MCP server implementation with HTTP and SSE Transport Support
@@ -255,10 +255,10 @@ export class PenpotMcpServer {
 
     /**
      * Handles responses from the plugin for completed tasks.
-     * 
+     *
      * Finds the pending task by ID and resolves or rejects its promise
      * based on the execution result.
-     * 
+     *
      * @param response - The plugin task response containing ID and result
      */
     private handlePluginTaskResponse(response: PluginTaskResponse): void {
@@ -280,7 +280,7 @@ export class PenpotMcpServer {
         if (response.result.success) {
             task.resolveWithResult(response.result);
         } else {
-            const error = new Error(response.result.error || 'Task execution failed');
+            const error = new Error(response.result.error || "Task execution failed");
             task.rejectWithError(error);
         }
 
@@ -289,16 +289,14 @@ export class PenpotMcpServer {
 
     /**
      * Executes a plugin task by sending it to connected clients.
-     * 
+     *
      * Registers the task for result correlation and returns a promise
      * that resolves when the plugin responds with the execution result.
-     * 
+     *
      * @param task - The plugin task to execute
      * @throws Error if no plugin instances are connected or available
      */
-    public async executePluginTask<TResult extends PluginTaskResult>(
-        task: PluginTask<any, TResult>
-    ): Promise<void> {
+    public async executePluginTask<TResult extends PluginTaskResult>(task: PluginTask<any, TResult>): Promise<void> {
         // Check if there are connected clients
         if (this.connectedClients.size === 0) {
             throw new Error(
@@ -319,7 +317,7 @@ export class PenpotMcpServer {
                 sentCount++;
             }
         });
-        
+
         if (sentCount === 0) {
             // Clean up the pending task and timeout since we couldn't send it
             this.pendingTasks.delete(task.id);
