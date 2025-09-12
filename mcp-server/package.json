@@ -22,6 +22,7 @@
     "license": "MIT",
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.17.5",
+        "@penpot-mcp/common": "file:../common",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.0",
         "express": "^4.18.0",

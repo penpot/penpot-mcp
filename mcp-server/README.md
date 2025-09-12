@@ -111,3 +111,19 @@ For MCP clients that support HTTP transport directly, use:
 - Streamable HTTP for modern clients: `http://localhost:4401/mcp`
 - SSE for legacy clients: `http://localhost:4401/sse`
 
+## Plugin Communication
+
+The server also runs a WebSocket server on port 8080 for communication with Penpot plugins:
+
+- **WebSocket endpoint**: `ws://localhost:8080`
+- **Protocol**: Request/response with unique ID correlation
+- **Timeout**: 30 seconds for task completion
+- **Shared Types**: Uses `@penpot-mcp/common` package for type safety
+
+### WebSocket Protocol Features
+
+- **Request Correlation**: Each task has a unique UUID for matching responses
+- **Structured Results**: Tasks return `{success: boolean, error?: string, data?: any}`
+- **Timeout Handling**: Prevents hanging tasks with automatic cleanup
+- **Type Safety**: Shared TypeScript definitions across server and plugin
+

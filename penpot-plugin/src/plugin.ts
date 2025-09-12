@@ -1,7 +1,7 @@
 penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}`);
 
-// Handle both legacy string messages and new task-based messages
-penpot.ui.onMessage<string | { task: string; params: any }>((message) => {
+// Handle both legacy string messages and new request-based messages
+penpot.ui.onMessage<string | { id: string; task: string; params: any }>((message) => {
     // Legacy string-based message handling
     if (typeof message === "string") {
         if (message === "create-text") {
@@ -17,38 +17,47 @@ penpot.ui.onMessage<string | { task: string; params: any }>((message) => {
         return;
     }
 
-    // New task-based message handling
-    if (typeof message === "object" && message.task) {
-        handlePluginTask(message);
+    // New request-based message handling
+    if (typeof message === "object" && message.task && message.id) {
+        handlePluginTaskRequest(message);
     }
 });
 
 /**
- * Handles plugin tasks received from the MCP server via WebSocket.
+ * Handles plugin task requests received from the MCP server via WebSocket.
  *
- * @param taskMessage - The task message containing task type and parameters
+ * @param request - The task request containing ID, task type and parameters
  */
-function handlePluginTask(taskMessage: { task: string; params: any }): void {
-    console.log("Executing plugin task:", taskMessage.task, taskMessage.params);
+function handlePluginTaskRequest(request: { id: string; task: string; params: any }): void {
+    console.log("Executing plugin task:", request.task, request.params);
 
-    switch (taskMessage.task) {
+    switch (request.task) {
         case "printText":
-            handlePrintTextTask(taskMessage.params);
+            handlePrintTextTask(request.id, request.params);
             break;
 
         default:
-            console.warn("Unknown plugin task:", taskMessage.task);
+            console.warn("Unknown plugin task:", request.task);
+            sendTaskResponse(request.id, {
+                success: false,
+                error: `Unknown task type: ${request.task}`,
+            });
     }
 }
 
 /**
  * Handles the printText task by creating text in Penpot.
  *
+ * @param taskId - The unique ID of the task request
  * @param params - The parameters containing the text to create
  */
-function handlePrintTextTask(params: { text: string }): void {
+function handlePrintTextTask(taskId: string, params: { text: string }): void {
     if (!params.text) {
         console.error("printText task requires 'text' parameter");
+        sendTaskResponse(taskId, {
+            success: false,
+            error: "printText task requires 'text' parameter",
+        });
         return;
     }
 
@@ -64,12 +73,45 @@ function handlePrintTextTask(params: { text: string }): void {
             penpot.selection = [text];
 
             console.log("Successfully created text:", params.text);
+            sendTaskResponse(taskId, {
+                success: true,
+                data: { textId: text.id },
+            });
         } else {
             console.error("Failed to create text element");
+            sendTaskResponse(taskId, {
+                success: false,
+                error: "Failed to create text element",
+            });
         }
     } catch (error) {
         console.error("Error creating text:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        sendTaskResponse(taskId, {
+            success: false,
+            error: `Error creating text: ${errorMessage}`,
+        });
     }
+}
+
+/**
+ * Sends a task response back to the MCP server.
+ *
+ * @param taskId - The unique ID of the original task request
+ * @param result - The task execution result
+ */
+function sendTaskResponse(taskId: string, result: { success: boolean; error?: string; data?: any }): void {
+    const response = {
+        type: "task-response",
+        response: {
+            id: taskId,
+            result: result,
+        },
+    };
+
+    // Send to main.ts which will forward to MCP server via WebSocket
+    penpot.ui.sendMessage(response);
+    console.log("Sent task response:", response);
 }
 
 // Update the theme in the iframe

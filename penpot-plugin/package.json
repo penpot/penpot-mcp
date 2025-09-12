@@ -11,7 +11,8 @@
     },
     "dependencies": {
         "@penpot/plugin-styles": "1.3.2",
-        "@penpot/plugin-types": "1.3.2"
+        "@penpot/plugin-types": "1.3.2",
+        "@penpot-mcp/common": "file:../common"
     },
     "devDependencies": {
         "prettier": "^3.0.0",

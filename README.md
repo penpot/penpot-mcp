@@ -1,16 +1,57 @@
 # The Penpot MCP Server
 
-The system consists of two main components:
+This system enables LLMs to interact with Penpot design projects through a Model Context Protocol (MCP) server and plugin architecture.
 
-1. **MCP Server** (`mcp-server/`): 
-   - Runs the MCP server providing tools to an LLM for Penpot project interaction
-   - Runs a WebSocket server which accepts connections from the Penpot MCP Plugin,
-     establishing a communication channel between the plugin and the MCP server
+## Architecture
 
-2. **Penpot MCP Plugin** (`penpot-plugin/`):
-   - Establishes WebSocket connection to the MCP server
-   - Receives tasks from the MCP server, which it executes in the Penpot project, making
-     use of the Penpot Plugin API
+The system consists of three main components:
+
+1. **Common Types** (`common/`): 
+   - Shared TypeScript definitions for request/response protocol
+   - Ensures type safety across server and plugin components
+   - Defines `PluginTaskResult`, request/response interfaces, and task parameters
+
+2. **MCP Server** (`mcp-server/`): 
+   - Provides MCP tools to LLMs for Penpot interaction
+   - Runs WebSocket server accepting connections from Penpot plugins
+   - Implements request/response correlation with unique task IDs
+   - Handles task timeouts and proper error reporting
+
+3. **Penpot Plugin** (`penpot-plugin/`):
+   - Connects to MCP server via WebSocket
+   - Executes tasks in Penpot using the Plugin API  
+   - Sends structured responses back to server with success/failure status
+
+## Protocol Flow
+
+```
+LLM → MCP Server → WebSocket → Penpot Plugin → Penpot API
+     ↓                      ↓               ↓
+   Tool Call          Task Request    Execute Action
+     ↑                      ↑               ↑
+LLM ← MCP Server ← WebSocket ← Penpot Plugin ← Result
+```
+
+### Request Format
+```typescript
+{
+  id: string,           // Unique UUID for correlation
+  task: string,         // Task type (e.g., "printText")
+  params: object        // Task-specific parameters
+}
+```
+
+### Response Format  
+```typescript
+{
+  id: string,           // Matching request ID
+  result: {
+    success: boolean,   // Task completion status
+    error?: string,     // Error message if failed
+    data?: any         // Optional result data
+  }
+}
+```
 
 ## Testing the Connection
 

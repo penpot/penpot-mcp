@@ -4,7 +4,8 @@ import type { ToolResponse } from "../ToolResponse";
 import { TextResponse } from "../ToolResponse";
 import "reflect-metadata";
 import { PenpotMcpServer } from "../PenpotMcpServer";
-import { PrintTextPluginTask, PrintTextPluginTaskParams } from "../tasks/PrintTextPluginTask";
+import { PrintTextPluginTask } from "../tasks/PrintTextPluginTask";
+import { PrintTextTaskParams } from '@penpot-mcp/common';
 
 /**
  * Arguments class for the PrintText tool with validation decorators.
@@ -43,11 +44,25 @@ export class PrintTextTool extends Tool<PrintTextArgs> {
     }
 
     protected async executeCore(args: PrintTextArgs): Promise<ToolResponse> {
-        const taskParams = new PrintTextPluginTaskParams(args.text);
+        const taskParams: PrintTextTaskParams = { text: args.text };
         const task = new PrintTextPluginTask(taskParams);
-        this.mcpServer.executePluginTask(task);
-        return new TextResponse(
-            `Successfully sent text creation task. Text "${args.text}" should now appear in Penpot.`
-        );
+        
+        try {
+            await this.mcpServer.executePluginTask(task);
+            const result = await task.getResultPromise();
+            
+            if (result.success) {
+                return new TextResponse(
+                    `Successfully created text "${args.text}" in Penpot.`
+                );
+            } else {
+                return new TextResponse(
+                    `Failed to create text in Penpot: ${result.error || 'Unknown error'}`
+                );
+            }
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            return new TextResponse(`Failed to execute text creation task: ${errorMessage}`);
+        }
     }
 }

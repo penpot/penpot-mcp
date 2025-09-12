@@ -19,6 +19,20 @@ function updateConnectionStatus(status: string, isConnectedState: boolean): void
 }
 
 /**
+ * Sends a task response back to the MCP server via WebSocket.
+ *
+ * @param response - The response containing task ID and result
+ */
+function sendTaskResponse(response: any): void {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(response));
+        console.log("Sent response to MCP server:", response);
+    } else {
+        console.error("WebSocket not connected, cannot send response");
+    }
+}
+
+/**
  * Establishes a WebSocket connection to the MCP server.
  */
 function connectToMcpServer(): void {
@@ -39,9 +53,9 @@ function connectToMcpServer(): void {
         ws.onmessage = (event) => {
             console.log("Received from MCP server:", event.data);
             try {
-                const message = JSON.parse(event.data);
-                // Forward the task to the plugin for execution
-                parent.postMessage(message, "*");
+                const request = JSON.parse(event.data);
+                // Forward the task request to the plugin for execution
+                parent.postMessage(request, "*");
             } catch (error) {
                 console.error("Failed to parse WebSocket message:", error);
             }
@@ -77,5 +91,8 @@ document.querySelector("[data-handler='connect-mcp']")?.addEventListener("click"
 window.addEventListener("message", (event) => {
     if (event.data.source === "penpot") {
         document.body.dataset.theme = event.data.theme;
+    } else if (event.data.type === "task-response") {
+        // Forward task response back to MCP server
+        sendTaskResponse(event.data.response);
     }
 });
