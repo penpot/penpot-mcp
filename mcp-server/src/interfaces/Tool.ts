@@ -3,7 +3,7 @@ import { validate, ValidationError } from "class-validator";
 import { plainToClass } from "class-transformer";
 import "reflect-metadata";
 import { TextResponse, ToolResponse } from "./ToolResponse.js";
-import type { PenpotMcpServer } from "../index.js";
+import type { PenpotMcpServer } from "../PenpotMcpServer.js";
 
 /**
  * Base interface for MCP tool implementations.

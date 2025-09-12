@@ -1,23 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * Penpot MCP Server with HTTP and SSE Transport Support
- *
- * This server implementation supports both modern Streamable HTTP and legacy SSE transports
- * instead of the traditional stdio transport. This provides better compatibility with
- * web-based MCP clients and allows for more flexible deployment scenarios.
- *
- * Transport Endpoints:
- * - Modern Streamable HTTP: POST/GET/DELETE /mcp
- * - Legacy SSE: GET /sse and POST /messages
- * - WebSocket (for plugin communication): ws://localhost:8080
- *
- * Usage:
- * - Default port: node dist/index.js (runs on 4401)
- * - Custom port: node dist/index.js --port 8080
- * - Help: node dist/index.js --help
- */
-
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { WebSocket, WebSocketServer } from "ws";
@@ -28,10 +10,7 @@ import { PrintTextTool } from "./tools/PrintTextTool.js";
 import { PluginTask } from "./interfaces/PluginTask.js";
 
 /**
- * Main MCP server implementation for Penpot integration.
- *
- * This server manages tool registration and execution using a clean
- * abstraction pattern that allows for easy extension with new tools.
+ * Penpot MCP server implementation with HTTP and SSE Transport Support
  */
 export class PenpotMcpServer {
     private readonly server: Server;
@@ -313,62 +292,4 @@ export class PenpotMcpServer {
             });
         });
     }
-}
-
-/**
- * Application entry point.
- *
- * Creates and starts the MCP server instance, handling any startup errors
- * gracefully and ensuring proper process termination.
- */
-async function main(): Promise<void> {
-    try {
-        // Parse command line arguments for port configuration
-        const args = process.argv.slice(2);
-        let port = 4401; // Default port
-
-        for (let i = 0; i < args.length; i++) {
-            if (args[i] === "--port" || args[i] === "-p") {
-                if (i + 1 < args.length) {
-                    const portArg = parseInt(args[i + 1], 10);
-                    if (!isNaN(portArg) && portArg > 0 && portArg <= 65535) {
-                        port = portArg;
-                    } else {
-                        console.error("Invalid port number. Using default port 4401.");
-                    }
-                }
-            } else if (args[i] === "--help" || args[i] === "-h") {
-                console.log("Usage: node dist/index.js [options]");
-                console.log("Options:");
-                console.log("  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)");
-                console.log("  --help, -h             Show this help message");
-                process.exit(0);
-            }
-        }
-
-        const server = new PenpotMcpServer(port);
-        await server.start();
-
-        // Keep the process alive
-        process.on("SIGINT", () => {
-            console.error("Received SIGINT, shutting down gracefully...");
-            process.exit(0);
-        });
-
-        process.on("SIGTERM", () => {
-            console.error("Received SIGTERM, shutting down gracefully...");
-            process.exit(0);
-        });
-    } catch (error) {
-        console.error("Failed to start MCP server:", error);
-        process.exit(1);
-    }
-}
-
-// Start the server if this file is run directly
-if (import.meta.url.endsWith(process.argv[1]) || process.argv[1].endsWith("index.js")) {
-    main().catch((error) => {
-        console.error("Unhandled error in main:", error);
-        process.exit(1);
-    });
 }

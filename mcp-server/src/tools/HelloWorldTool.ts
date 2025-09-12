@@ -3,7 +3,7 @@ import { Tool } from "../interfaces/Tool.js";
 import "reflect-metadata";
 import type { ToolResponse } from "../interfaces/ToolResponse.js";
 import { TextResponse } from "../interfaces/ToolResponse.js";
-import { PenpotMcpServer } from "../index";
+import { PenpotMcpServer } from "../PenpotMcpServer.js";
 
 /**
  * Arguments class for the HelloWorld tool with validation decorators.

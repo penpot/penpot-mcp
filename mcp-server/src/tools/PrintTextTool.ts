@@ -4,7 +4,7 @@ import { PluginTaskPrintText, PluginTaskPrintTextParams } from "../interfaces/Pl
 import type { ToolResponse } from "../interfaces/ToolResponse.js";
 import { TextResponse } from "../interfaces/ToolResponse.js";
 import "reflect-metadata";
-import { PenpotMcpServer } from "../index.js";
+import { PenpotMcpServer } from "../PenpotMcpServer.js";
 
 /**
  * Arguments class for the PrintText tool with validation decorators.
