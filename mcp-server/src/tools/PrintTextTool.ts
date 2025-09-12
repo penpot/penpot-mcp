@@ -1,8 +1,8 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { Tool } from "../interfaces/Tool.js";
-import { PluginTaskPrintText, PluginTaskPrintTextParams } from "../interfaces/PluginTask.js";
-import type { ToolResponse } from "../interfaces/ToolResponse.js";
-import { TextResponse } from "../interfaces/ToolResponse.js";
+import { Tool } from "../Tool.js";
+import { PluginTaskPrintText, PluginTaskPrintTextParams } from "../PluginTask.js";
+import type { ToolResponse } from "../ToolResponse.js";
+import { TextResponse } from "../ToolResponse.js";
 import "reflect-metadata";
 import { PenpotMcpServer } from "../PenpotMcpServer.js";
 

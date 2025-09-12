@@ -4,10 +4,10 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { WebSocket, WebSocketServer } from "ws";
 
-import { ToolInterface } from "./interfaces/Tool.js";
+import { ToolInterface } from "./Tool";
 import { HelloWorldTool } from "./tools/HelloWorldTool.js";
 import { PrintTextTool } from "./tools/PrintTextTool.js";
-import { PluginTask } from "./interfaces/PluginTask.js";
+import { PluginTask } from "./PluginTask.js";
 
 /**
  * Penpot MCP server implementation with HTTP and SSE Transport Support
