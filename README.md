@@ -55,6 +55,13 @@ LLM ← MCP Server ← WebSocket ← Penpot Plugin ← Result
 
 ## Testing the Connection
 
+### Step 0: Build the common components
+
+```bash
+cd common
+npm run build
+```
+
 ### Step 1: Start the MCP Server
 
 ```bash
