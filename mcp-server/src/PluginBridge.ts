@@ -1,6 +1,6 @@
-import { WebSocket, WebSocketServer } from "ws";
-import { PluginTask } from "./PluginTask";
-import { PluginTaskResponse, PluginTaskResult } from "@penpot-mcp/common";
+import {WebSocket, WebSocketServer} from "ws";
+import {PluginTask} from "./PluginTask";
+import {PluginTaskResponse} from "@penpot-mcp/common";
 
 /**
  * Provides the connection to the Penpot MCP Plugin via WebSocket

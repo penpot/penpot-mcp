@@ -1,31 +1,22 @@
-
 /**
- * Abstract base class for task handlers in the Penpot MCP plugin.
- *
- * @template TParams - The type of parameters this handler expects
+ * Represents a task received from the MCP server in the Penpot MCP plugin
  */
-export abstract class TaskHandler<TParams = any> {
-    /** The task identifier this handler is responsible for */
-    abstract readonly task: string;
-
+export class Task<TParams = any> {
     /**
-     * Checks if this handler can process the given task.
-     *
-     * @param task - The task identifier to check
-     * @returns True if this handler applies to the given task
+     * @param requestId Unique identifier for the task request
+     * @param taskType The type of the task to execute
+     * @param params Task parameters/arguments
      */
-    applies(task: string): boolean {
-        return this.task === task;
-    }
+    constructor(public requestId: string, public taskType: string, public params: TParams) {}
 
     /**
      * Sends a task response back to the MCP server.
      */
-    public static sendTaskResponse(taskId: string, success: boolean, data: any = undefined, error: any = undefined): void {
+    protected sendResponse(success: boolean, data: any = undefined, error: any = undefined): void {
         const response = {
             type: "task-response",
             response: {
-                id: taskId,
+                id: this.requestId,
                 success: success,
                 data: data,
                 error: error,
@@ -37,19 +28,38 @@ export abstract class TaskHandler<TParams = any> {
         console.log("Sent task response:", response);
     }
 
-    public static sendTaskSuccess(taskId: string, data: any = undefined): void {
-        this.sendTaskResponse(taskId, true, data);
+    public sendSuccess(data: any = undefined): void {
+        this.sendResponse(true, data);
     }
 
-    public static sendTaskError(taskId: string, error: string): void {
-        this.sendTaskResponse(taskId, false, undefined, error);
+    public sendError(error: string): void {
+        this.sendResponse(false, undefined, error);
+    }
+}
+
+/**
+ * Abstract base class for task handlers in the Penpot MCP plugin.
+ *
+ * @template TParams - The type of parameters this handler expects
+ */
+export abstract class TaskHandler<TParams = any> {
+    /** The task type this handler is responsible for */
+    abstract readonly taskType: string;
+
+    /**
+     * Checks if this handler can process the given task.
+     *
+     * @param task - The task identifier to check
+     * @returns True if this handler applies to the given task
+     */
+    isApplicableTo(task: Task): boolean {
+        return this.taskType === task.taskType;
     }
 
     /**
      * Handles the task with the provided parameters.
      *
-     * @param taskId - The unique ID of the task request
-     * @param params - The parameters for the task
+     * @param task - The task to be handled
      */
-    abstract handle(taskId: string, params: TParams): void;
+    abstract handle(task: Task<TParams>): void;
 }

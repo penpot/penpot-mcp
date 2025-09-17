@@ -1,5 +1,5 @@
 import {PrintTextTaskHandler} from "./task-handlers/PrintTextTaskHandler";
-import {TaskHandler} from "./TaskHandler";
+import {Task, TaskHandler} from "./TaskHandler";
 
 /**
  * Registry of all available task handlers.
@@ -40,22 +40,25 @@ penpot.ui.onMessage<string | { id: string; task: string; params: any }>((message
  */
 function handlePluginTaskRequest(request: { id: string; task: string; params: any }): void {
     console.log("Executing plugin task:", request.task, request.params);
+    const task = new Task(request.id, request.task, request.params);
 
     // Find the appropriate handler
-    const handler = taskHandlers.find(h => h.applies(request.task));
+    const handler = taskHandlers.find(h => h.isApplicableTo(task));
 
     if (handler) {
         try {
             // Cast the params to the expected type and handle the task
-            handler.handle(request.id, request.params);
+            console.log("Processing task with handler:", handler);
+            handler.handle(task);
+            console.log("Task handled successfully:", task);
         } catch (error) {
-            console.error(`Error handling task '${request.task}':`, error);
+            console.error("Error creating text:", error);
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
-            TaskHandler.sendTaskError(request.id, `Error handling task: ${errorMessage}`);
+            task.sendError(`Error handling task: ${errorMessage}`);
         }
     } else {
         console.warn("Unknown plugin task:", request.task);
-        TaskHandler.sendTaskError(request.id, `Unknown task type: ${request.task}`);
+        task.sendError(`Unknown task type: ${request.task}`);
     }
 }
 
