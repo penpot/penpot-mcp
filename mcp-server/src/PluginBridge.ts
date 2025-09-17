@@ -1,6 +1,6 @@
 import {WebSocket, WebSocketServer} from "ws";
 import {PluginTask} from "./PluginTask";
-import {PluginTaskResponse} from "@penpot-mcp/common";
+import {PluginTaskResponse, PluginTaskResult} from "@penpot-mcp/common";
 
 /**
  * Provides the connection to the Penpot MCP Plugin via WebSocket
@@ -97,7 +97,7 @@ export class PluginBridge {
      * @param task - The plugin task to execute
      * @throws Error if no plugin instances are connected or available
      */
-    public async executePluginTask<TResult>(task: PluginTask<any, TResult>): Promise<TResult> {
+    public async executePluginTask<TResult extends PluginTaskResult<any>>(task: PluginTask<any, TResult>): Promise<TResult> {
         // Check if there are connected clients
         if (this.connectedClients.size === 0) {
             throw new Error(

@@ -18,7 +18,7 @@ import { randomUUID } from "crypto";
  * @template TParams - The strongly-typed parameters for this task
  * @template TResult - The expected result type from task execution
  */
-export abstract class PluginTask<TParams = any, TResult extends PluginTaskResult = PluginTaskResult> {
+export abstract class PluginTask<TParams = any, TResult extends PluginTaskResult<any> = PluginTaskResult<any>> {
     /**
      * Unique identifier for request/response correlation.
      */

@@ -7,7 +7,7 @@ import { PrintTextTaskParams, PluginTaskResult } from "@penpot-mcp/common";
  * This task instructs the plugin to create a text element
  * at the viewport center and select it.
  */
-export class PrintTextPluginTask extends PluginTask<PrintTextTaskParams, PluginTaskResult> {
+export class PrintTextPluginTask extends PluginTask<PrintTextTaskParams, PluginTaskResult<any>> {
     /**
      * Creates a new print text task.
      *
