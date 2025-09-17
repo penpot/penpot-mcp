@@ -1,11 +1,13 @@
-import {WebSocket, WebSocketServer} from "ws";
-import {PluginTask} from "./PluginTask";
-import {PluginTaskResponse, PluginTaskResult} from "@penpot-mcp/common";
+import { WebSocket, WebSocketServer } from "ws";
+import { PluginTask } from "./PluginTask";
+import { PluginTaskResponse, PluginTaskResult } from "@penpot-mcp/common";
+import { createLogger } from "./logger";
 
 /**
  * Provides the connection to the Penpot MCP Plugin via WebSocket
  */
 export class PluginBridge {
+    private readonly logger = createLogger("PluginBridge");
     private readonly wsServer: WebSocketServer;
     private readonly connectedClients: Set<WebSocket> = new Set();
     private readonly pendingTasks: Map<string, PluginTask<any, any>> = new Map();
@@ -27,31 +29,31 @@ export class PluginBridge {
      */
     private setupWebSocketHandlers(): void {
         this.wsServer.on("connection", (ws: WebSocket) => {
-            console.error("New WebSocket connection established");
+            this.logger.info("New WebSocket connection established");
             this.connectedClients.add(ws);
 
             ws.on("message", (data: Buffer) => {
-                console.error("Received WebSocket message:", data.toString());
+                this.logger.info("Received WebSocket message: %s", data.toString());
                 try {
                     const response: PluginTaskResponse<any> = JSON.parse(data.toString());
                     this.handlePluginTaskResponse(response);
                 } catch (error) {
-                    console.error("Failed to parse WebSocket message:", error);
+                    this.logger.error(error, "Failed to parse WebSocket message");
                 }
             });
 
             ws.on("close", () => {
-                console.error("WebSocket connection closed");
+                this.logger.info("WebSocket connection closed");
                 this.connectedClients.delete(ws);
             });
 
             ws.on("error", (error) => {
-                console.error("WebSocket connection error:", error);
+                this.logger.error(error, "WebSocket connection error");
                 this.connectedClients.delete(ws);
             });
         });
 
-        console.error("WebSocket server started on port 8080");
+        this.logger.info("WebSocket server started on port 8080");
     }
 
     /**
@@ -65,7 +67,7 @@ export class PluginBridge {
     private handlePluginTaskResponse(response: PluginTaskResponse<any>): void {
         const task = this.pendingTasks.get(response.id);
         if (!task) {
-            console.error(`Received response for unknown task ID: ${response.id}`);
+            this.logger.info(`Received response for unknown task ID: ${response.id}`);
             return;
         }
 
@@ -85,7 +87,7 @@ export class PluginBridge {
             task.rejectWithError(error);
         }
 
-        console.error(`Task ${response.id} completed: success=${response.success}`);
+        this.logger.info(`Task ${response.id} completed: success=${response.success}`);
     }
 
     /**
@@ -97,7 +99,9 @@ export class PluginBridge {
      * @param task - The plugin task to execute
      * @throws Error if no plugin instances are connected or available
      */
-    public async executePluginTask<TResult extends PluginTaskResult<any>>(task: PluginTask<any, TResult>): Promise<TResult> {
+    public async executePluginTask<TResult extends PluginTaskResult<any>>(
+        task: PluginTask<any, TResult>
+    ): Promise<TResult> {
         // Check if there are connected clients
         if (this.connectedClients.size === 0) {
             throw new Error(
@@ -143,7 +147,7 @@ export class PluginBridge {
         }, this.taskTimeoutSecs * 1000);
 
         this.taskTimeouts.set(task.id, timeoutHandle);
-        console.error(`Sent task ${task.id} to ${sentCount} connected clients`);
+        this.logger.info(`Sent task ${task.id} to ${sentCount} connected clients`);
 
         return await task.getResultPromise();
     }

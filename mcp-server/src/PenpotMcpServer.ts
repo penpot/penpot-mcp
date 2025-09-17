@@ -5,11 +5,13 @@ import { ToolInterface } from "./Tool";
 import { HelloWorldTool } from "./tools/HelloWorldTool";
 import { PrintTextTool } from "./tools/PrintTextTool";
 import { PluginBridge } from "./PluginBridge";
+import { createLogger } from "./logger";
 
 /**
  * Penpot MCP server implementation with HTTP and SSE Transport Support
  */
 export class PenpotMcpServer {
+    private readonly logger = createLogger("PenpotMcpServer");
     private readonly server: Server;
     private readonly tools: Map<string, ToolInterface>;
     private app: any; // Express app
@@ -227,10 +229,10 @@ export class PenpotMcpServer {
 
         return new Promise((resolve) => {
             this.app.listen(this.port, () => {
-                console.error(`Penpot MCP Server started successfully on port ${this.port}`);
-                console.error(`Modern Streamable HTTP endpoint: http://localhost:${this.port}/mcp`);
-                console.error(`Legacy SSE endpoint: http://localhost:${this.port}/sse`);
-                console.error("WebSocket server is listening on ws://localhost:8080");
+                this.logger.info(`Penpot MCP Server started successfully on port ${this.port}`);
+                this.logger.info(`Modern Streamable HTTP endpoint: http://localhost:${this.port}/mcp`);
+                this.logger.info(`Legacy SSE endpoint: http://localhost:${this.port}/sse`);
+                this.logger.info("WebSocket server is listening on ws://localhost:8080");
                 resolve();
             });
         });

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { PenpotMcpServer } from "./PenpotMcpServer";
+import { createLogger } from "./logger";
 
 /**
  * Entry point for Penpot MCP Server
@@ -15,6 +16,7 @@ import { PenpotMcpServer } from "./PenpotMcpServer";
  */
 
 async function main(): Promise<void> {
+    const logger = createLogger("main");
     try {
         // Parse command line arguments for port configuration
         const args = process.argv.slice(2);
@@ -27,14 +29,14 @@ async function main(): Promise<void> {
                     if (!isNaN(portArg) && portArg > 0 && portArg <= 65535) {
                         port = portArg;
                     } else {
-                        console.error("Invalid port number. Using default port 4401.");
+                        logger.info("Invalid port number. Using default port 4401.");
                     }
                 }
             } else if (args[i] === "--help" || args[i] === "-h") {
-                console.log("Usage: node dist/index.js [options]");
-                console.log("Options:");
-                console.log("  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)");
-                console.log("  --help, -h             Show this help message");
+                logger.info("Usage: node dist/index.js [options]");
+                logger.info("Options:");
+                logger.info("  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)");
+                logger.info("  --help, -h             Show this help message");
                 process.exit(0);
             }
         }
@@ -44,16 +46,16 @@ async function main(): Promise<void> {
 
         // Keep the process alive
         process.on("SIGINT", () => {
-            console.error("Received SIGINT, shutting down gracefully...");
+            logger.info("Received SIGINT, shutting down gracefully...");
             process.exit(0);
         });
 
         process.on("SIGTERM", () => {
-            console.error("Received SIGTERM, shutting down gracefully...");
+            logger.info("Received SIGTERM, shutting down gracefully...");
             process.exit(0);
         });
     } catch (error) {
-        console.error("Failed to start MCP server:", error);
+        logger.error(error, "Failed to start MCP server");
         process.exit(1);
     }
 }
@@ -61,7 +63,7 @@ async function main(): Promise<void> {
 // Start the server if this file is run directly
 if (import.meta.url.endsWith(process.argv[1]) || process.argv[1].endsWith("index.js")) {
     main().catch((error) => {
-        console.error("Unhandled error in main:", error);
+        createLogger("main").error(error, "Unhandled error in main");
         process.exit(1);
     });
 }
