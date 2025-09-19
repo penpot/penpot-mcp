@@ -68,3 +68,13 @@ export interface PrintTextTaskParams {
      */
     text: string;
 }
+
+/**
+ * Parameters for the executeCode task.
+ */
+export interface ExecuteCodeTaskParams {
+    /**
+     * The JavaScript code to be executed.
+     */
+    code: string;
+}

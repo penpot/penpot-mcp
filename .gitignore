@@ -1,4 +1,7 @@
 .idea
 node_modules
 dist
+*.bak
+*.orig
 temp
+*.tsbuildinfo

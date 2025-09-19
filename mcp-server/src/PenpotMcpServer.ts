@@ -4,6 +4,7 @@ import { CallToolRequestSchema, CallToolResult, ListToolsRequestSchema } from "@
 import { ToolInterface } from "./Tool";
 import { HelloWorldTool } from "./tools/HelloWorldTool";
 import { PrintTextTool } from "./tools/PrintTextTool";
+import { ExecuteCodeTool } from "./tools/ExecuteCodeTool";
 import { PluginBridge } from "./PluginBridge";
 import { createLogger } from "./logger";
 
@@ -58,7 +59,7 @@ export class PenpotMcpServer {
      * the internal registry for later execution.
      */
     private registerTools(): void {
-        const toolInstances: ToolInterface[] = [new HelloWorldTool(this), new PrintTextTool(this)];
+        const toolInstances: ToolInterface[] = [new HelloWorldTool(this), new PrintTextTool(this), new ExecuteCodeTool(this)];
 
         for (const tool of toolInstances) {
             this.tools.set(tool.definition.name, tool);

@@ -1,4 +1,5 @@
 import {PrintTextTaskHandler} from "./task-handlers/PrintTextTaskHandler";
+import {ExecuteCodeTaskHandler} from "./task-handlers/ExecuteCodeTaskHandler";
 import {Task, TaskHandler} from "./TaskHandler";
 
 /**
@@ -6,6 +7,7 @@ import {Task, TaskHandler} from "./TaskHandler";
  */
 const taskHandlers: TaskHandler[] = [
     new PrintTextTaskHandler(),
+    new ExecuteCodeTaskHandler(),
 ];
 
 penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}`);
@@ -52,12 +54,12 @@ function handlePluginTaskRequest(request: { id: string; task: string; params: an
             handler.handle(task);
             console.log("Task handled successfully:", task);
         } catch (error) {
-            console.error("Error creating text:", error);
+            console.error("Error handling task:", error);
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
             task.sendError(`Error handling task: ${errorMessage}`);
         }
     } else {
-        console.warn("Unknown plugin task:", request.task);
+        console.error("Unknown plugin task:", request.task);
         task.sendError(`Unknown task type: ${request.task}`);
     }
 }
