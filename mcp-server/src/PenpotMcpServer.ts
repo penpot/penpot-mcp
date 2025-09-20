@@ -6,6 +6,7 @@ import { HelloWorldTool } from "./tools/HelloWorldTool";
 import { PrintTextTool } from "./tools/PrintTextTool";
 import { ExecuteCodeTool } from "./tools/ExecuteCodeTool";
 import { PluginBridge } from "./PluginBridge";
+import { ConfigurationLoader } from "./ConfigurationLoader";
 import { createLogger } from "./logger";
 
 /**
@@ -15,6 +16,7 @@ export class PenpotMcpServer {
     private readonly logger = createLogger("PenpotMcpServer");
     private readonly server: Server;
     private readonly tools: Map<string, ToolInterface>;
+    private readonly configLoader: ConfigurationLoader;
     private app: any; // Express app
     private readonly port: number;
     public readonly pluginBridge: PluginBridge;
@@ -46,6 +48,7 @@ export class PenpotMcpServer {
         );
 
         this.tools = new Map<string, ToolInterface>();
+        this.configLoader = new ConfigurationLoader();
         this.pluginBridge = new PluginBridge(webSocketPort);
 
         this.setupMcpHandlers();
@@ -220,6 +223,40 @@ export class PenpotMcpServer {
      * This method establishes the HTTP server and begins listening
      * for both modern and legacy MCP protocol connections.
      */
+    /**
+     * Displays initial instructions from the configuration.
+     * 
+     * Loads and logs the initial instructions for the MCP server,
+     * providing helpful information to users about available capabilities
+     * and usage guidelines.
+     */
+    private displayInitialInstructions(): void {
+        const initialInstructions = this.configLoader.getInitialInstructions();
+        
+        if (initialInstructions) {
+            this.logger.info("=".repeat(80));
+            this.logger.info("INITIAL INSTRUCTIONS");
+            this.logger.info("=".repeat(80));
+            
+            // Split instructions by lines and log each one separately for better formatting
+            const lines = initialInstructions.split('\n');
+            for (const line of lines) {
+                this.logger.info(line);
+            }
+            
+            this.logger.info("=".repeat(80));
+        }
+    }
+
+    /**
+     * Gets the configuration loader instance.
+     * 
+     * @returns The configuration loader for accessing prompts and settings
+     */
+    public getConfigurationLoader(): ConfigurationLoader {
+        return this.configLoader;
+    }
+
     async start(): Promise<void> {
         // Import express as ES module and setup HTTP endpoints
         const { default: express } = await import("express");
@@ -234,6 +271,10 @@ export class PenpotMcpServer {
                 this.logger.info(`Modern Streamable HTTP endpoint: http://localhost:${this.port}/mcp`);
                 this.logger.info(`Legacy SSE endpoint: http://localhost:${this.port}/sse`);
                 this.logger.info("WebSocket server is listening on ws://localhost:8080");
+                
+                // Display initial instructions if configured
+                this.displayInitialInstructions();
+                
                 resolve();
             });
         });
