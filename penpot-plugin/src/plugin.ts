@@ -52,6 +52,13 @@ function handlePluginTaskRequest(request: { id: string; task: string; params: an
             // Cast the params to the expected type and handle the task
             console.log("Processing task with handler:", handler);
             handler.handle(task);
+
+            // check whether a response was sent and send a generic success if not
+            if (!task.isResponseSent) {
+                console.warn("Handler did not send a response, sending generic success.");
+                task.sendSuccess("Task completed without a specific response.");
+            }
+
             console.log("Task handled successfully:", task);
         } catch (error) {
             console.error("Error handling task:", error);

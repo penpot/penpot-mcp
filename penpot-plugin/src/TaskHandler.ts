@@ -2,6 +2,8 @@
  * Represents a task received from the MCP server in the Penpot MCP plugin
  */
 export class Task<TParams = any> {
+    public isResponseSent: boolean = false;
+
     /**
      * @param requestId Unique identifier for the task request
      * @param taskType The type of the task to execute
@@ -13,6 +15,11 @@ export class Task<TParams = any> {
      * Sends a task response back to the MCP server.
      */
     protected sendResponse(success: boolean, data: any = undefined, error: any = undefined): void {
+        if (this.isResponseSent) {
+            console.error("Response already sent for task:", this.requestId);
+            return;
+        }
+
         const response = {
             type: "task-response",
             response: {
@@ -26,6 +33,7 @@ export class Task<TParams = any> {
         // Send to main.ts which will forward to MCP server via WebSocket
         penpot.ui.sendMessage(response);
         console.log("Sent task response:", response);
+        this.isResponseSent = true;
     }
 
     public sendSuccess(data: any = undefined): void {
