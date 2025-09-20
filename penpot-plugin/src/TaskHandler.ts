@@ -9,7 +9,11 @@ export class Task<TParams = any> {
      * @param taskType The type of the task to execute
      * @param params Task parameters/arguments
      */
-    constructor(public requestId: string, public taskType: string, public params: TParams) {}
+    constructor(
+        public requestId: string,
+        public taskType: string,
+        public params: TParams
+    ) {}
 
     /**
      * Sends a task response back to the MCP server.

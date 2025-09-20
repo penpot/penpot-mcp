@@ -1,14 +1,14 @@
-import {Task, TaskHandler} from "../TaskHandler";
-import {ExecuteCodeTaskParams} from "../../../common/src";
+import { Task, TaskHandler } from "../TaskHandler";
+import { ExecuteCodeTaskParams } from "../../../common/src";
 
 /**
  * Task handler for executing JavaScript code in the plugin context.
- * 
+ *
  * Maintains a persistent context object that preserves state between code executions.
  */
 export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
     readonly taskType = "executeCode";
-    
+
     /**
      * Persistent context object that maintains state between code executions.
      * Contains the penpot API and any variables defined in executed code.
@@ -21,7 +21,7 @@ export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
         // initialize context, making penpot object available
         this.context = {
             penpot: penpot,
-            storage: {}
+            storage: {},
         };
     }
 

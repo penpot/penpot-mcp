@@ -1,14 +1,11 @@
-import {PrintTextTaskHandler} from "./task-handlers/PrintTextTaskHandler";
-import {ExecuteCodeTaskHandler} from "./task-handlers/ExecuteCodeTaskHandler";
-import {Task, TaskHandler} from "./TaskHandler";
+import { PrintTextTaskHandler } from "./task-handlers/PrintTextTaskHandler";
+import { ExecuteCodeTaskHandler } from "./task-handlers/ExecuteCodeTaskHandler";
+import { Task, TaskHandler } from "./TaskHandler";
 
 /**
  * Registry of all available task handlers.
  */
-const taskHandlers: TaskHandler[] = [
-    new PrintTextTaskHandler(),
-    new ExecuteCodeTaskHandler(),
-];
+const taskHandlers: TaskHandler[] = [new PrintTextTaskHandler(), new ExecuteCodeTaskHandler()];
 
 penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}`);
 
@@ -45,7 +42,7 @@ function handlePluginTaskRequest(request: { id: string; task: string; params: an
     const task = new Task(request.id, request.task, request.params);
 
     // Find the appropriate handler
-    const handler = taskHandlers.find(h => h.isApplicableTo(task));
+    const handler = taskHandlers.find((h) => h.isApplicableTo(task));
 
     if (handler) {
         try {
@@ -70,7 +67,6 @@ function handlePluginTaskRequest(request: { id: string; task: string; params: an
         task.sendError(`Unknown task type: ${request.task}`);
     }
 }
-
 
 // Update the theme in the iframe
 penpot.on("themechange", (theme) => {

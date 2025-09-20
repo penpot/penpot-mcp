@@ -1,5 +1,5 @@
-import {Task, TaskHandler} from "../TaskHandler";
-import {PrintTextTaskParams} from "../../../common/src";
+import { Task, TaskHandler } from "../TaskHandler";
+import { PrintTextTaskParams } from "../../../common/src";
 
 /**
  * Task handler for printing text to Penpot.
