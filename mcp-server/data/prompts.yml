@@ -22,3 +22,5 @@ initial_instructions: |
       generateMarkup(shapes: Shape[], options?: {
           type?: "html" | "svg";
       }): string;
+  
+  You have hereby read the 'Penpot High-Level Overview' and need not use a tool to read it again.

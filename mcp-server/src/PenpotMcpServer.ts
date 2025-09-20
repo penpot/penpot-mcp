@@ -9,6 +9,7 @@ import { PluginBridge } from "./PluginBridge";
 import { ConfigurationLoader } from "./ConfigurationLoader";
 import { createLogger } from "./logger";
 import { Tool } from "./Tool";
+import { HighLevelOverviewTool } from "./tools/HighLevelOverviewTool";
 
 export class PenpotMcpServer {
     private readonly logger = createLogger("PenpotMcpServer");
@@ -29,7 +30,6 @@ export class PenpotMcpServer {
         this.port = port;
 
         const instructions = this.configLoader.getInitialInstructions();
-        this.logger.info("Instructions: %s", instructions ?? "<none>");
         this.server = new McpServer(
             {
                 name: "penpot-mcp-server",
@@ -46,11 +46,16 @@ export class PenpotMcpServer {
         this.registerTools();
     }
 
+    public getInitialInstructions(): string {
+        return this.configLoader.getInitialInstructions();
+    }
+
     private registerTools(): void {
         const toolInstances: Tool<any>[] = [
             new HelloWorldTool(this),
             new PrintTextTool(this),
             new ExecuteCodeTool(this),
+            new HighLevelOverviewTool(this),
         ];
 
         for (const tool of toolInstances) {

@@ -9,7 +9,7 @@ import { createLogger } from "./logger.js";
  */
 export interface PromptsConfig {
     /** Initial instructions displayed when the server starts or connects to a client */
-    initial_instructions?: string;
+    initial_instructions: string;
     [key: string]: any; // Allow for future extension with additional prompt types
 }
 
@@ -51,24 +51,16 @@ export class ConfigurationLoader {
         const promptsPath = join(this.baseDir, "..", "data", "prompts.yml");
 
         if (!existsSync(promptsPath)) {
-            this.logger.warn(`Prompts configuration file not found at ${promptsPath}, using defaults`);
-            this.promptsConfig = {};
-            return this.promptsConfig;
+            throw new Error(`Prompts configuration file not found at ${promptsPath}, using defaults`);
         }
 
-        try {
-            const fileContent = readFileSync(promptsPath, "utf8");
-            const parsedConfig = yaml.load(fileContent) as PromptsConfig;
+        const fileContent = readFileSync(promptsPath, "utf8");
+        const parsedConfig = yaml.load(fileContent) as PromptsConfig;
 
-            this.promptsConfig = parsedConfig || {};
-            this.logger.info(`Loaded prompts configuration from ${promptsPath}`);
+        this.promptsConfig = parsedConfig || {};
+        this.logger.info(`Loaded prompts configuration from ${promptsPath}`);
 
-            return this.promptsConfig;
-        } catch (error) {
-            this.logger.error(error, `Failed to load prompts configuration from ${promptsPath}`);
-            this.promptsConfig = {};
-            return this.promptsConfig;
-        }
+        return this.promptsConfig;
     }
 
     /**
@@ -76,7 +68,7 @@ export class ConfigurationLoader {
      *
      * @returns The initial instructions string, or undefined if not configured
      */
-    public getInitialInstructions(): string | undefined {
+    public getInitialInstructions(): string {
         const config = this.getPromptsConfig();
         return config.initial_instructions;
     }

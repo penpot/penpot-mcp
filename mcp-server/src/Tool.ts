@@ -1,7 +1,4 @@
 import { z } from "zod";
-import { Tool as MCPTool } from "@modelcontextprotocol/sdk/types.js";
-import { validate, ValidationError } from "class-validator";
-import { plainToClass } from "class-transformer";
 import "reflect-metadata";
 import { TextResponse, ToolResponse } from "./ToolResponse";
 import type { PenpotMcpServer } from "./PenpotMcpServer";
