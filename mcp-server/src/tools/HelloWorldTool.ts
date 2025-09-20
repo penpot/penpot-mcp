@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { z } from "zod";
 import { Tool } from "../Tool";
 import "reflect-metadata";
 import type { ToolResponse } from "../ToolResponse";
@@ -9,11 +9,13 @@ import { PenpotMcpServer } from "../PenpotMcpServer";
  * Arguments class for the HelloWorld tool with validation decorators.
  */
 export class HelloWorldArgs {
+    static schema = {
+        name: z.string(),
+    };
+
     /**
      * The name to include in the greeting message.
      */
-    @IsString({ message: "Name must be a string" })
-    @IsNotEmpty({ message: "Name cannot be empty" })
     name!: string;
 }
 
@@ -28,14 +30,14 @@ export class HelloWorldTool extends Tool<HelloWorldArgs> {
      * @param mcpServer - The MCP server instance
      */
     constructor(mcpServer: PenpotMcpServer) {
-        super(mcpServer, HelloWorldArgs);
+        super(mcpServer, HelloWorldArgs.schema);
     }
 
-    protected getToolName(): string {
+    public getToolName(): string {
         return "hello_world";
     }
 
-    protected getToolDescription(): string {
+    public getToolDescription(): string {
         return "Returns a personalized greeting message with the provided name";
     }
 

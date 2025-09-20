@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { z } from "zod";
 import { Tool } from "../Tool";
 import type { ToolResponse } from "../ToolResponse";
 import { TextResponse } from "../ToolResponse";
@@ -11,11 +11,13 @@ import { PrintTextTaskParams } from "@penpot-mcp/common";
  * Arguments class for the PrintText tool with validation decorators.
  */
 export class PrintTextArgs {
+    static schema = {
+        text: z.string().min(1, "Text cannot be empty"),
+    };
+
     /**
      * The text to create in Penpot.
      */
-    @IsString({ message: "Text must be a string" })
-    @IsNotEmpty({ message: "Text cannot be empty" })
     text!: string;
 }
 
@@ -32,14 +34,14 @@ export class PrintTextTool extends Tool<PrintTextArgs> {
      * @param mcpServer - The MCP server instance
      */
     constructor(mcpServer: PenpotMcpServer) {
-        super(mcpServer, PrintTextArgs);
+        super(mcpServer, PrintTextArgs.schema);
     }
 
-    protected getToolName(): string {
+    public getToolName(): string {
         return "print_text";
     }
 
-    protected getToolDescription(): string {
+    public getToolDescription(): string {
         return "Creates text in Penpot at the viewport center and selects it";
     }
 

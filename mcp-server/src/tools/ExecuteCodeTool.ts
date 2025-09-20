@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { z } from "zod";
 import { Tool } from "../Tool";
 import type { ToolResponse } from "../ToolResponse";
 import { TextResponse } from "../ToolResponse";
@@ -11,11 +11,13 @@ import { ExecuteCodeTaskParams } from "@penpot-mcp/common";
  * Arguments class for ExecuteCodeTool
  */
 export class ExecuteCodeArgs {
+    static schema = {
+        code: z.string().min(1, "Code cannot be empty"),
+    };
+
     /**
      * The JavaScript code to execute in the plugin context.
      */
-    @IsString({ message: "Code must be a string" })
-    @IsNotEmpty({ message: "Code cannot be empty" })
     code!: string;
 }
 
@@ -29,14 +31,14 @@ export class ExecuteCodeTool extends Tool<ExecuteCodeArgs> {
      * @param mcpServer - The MCP server instance
      */
     constructor(mcpServer: PenpotMcpServer) {
-        super(mcpServer, ExecuteCodeArgs);
+        super(mcpServer, ExecuteCodeArgs.schema);
     }
 
-    protected getToolName(): string {
+    public getToolName(): string {
         return "execute_code";
     }
 
-    protected getToolDescription(): string {
+    public getToolDescription(): string {
         return (
             "Executes JavaScript code in the Penpot plugin context. " +
             "Two objects are available: `penpot` (the Penpot API) and `storage` (an object in which arbitrary " +
