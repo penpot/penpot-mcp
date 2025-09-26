@@ -10,6 +10,7 @@ import { ConfigurationLoader } from "./ConfigurationLoader";
 import { createLogger } from "./logger";
 import { Tool } from "./Tool";
 import { HighLevelOverviewTool } from "./tools/HighLevelOverviewTool";
+import { PenpotApiInfoTool } from "./tools/PenpotApiInfoTool";
 
 export class PenpotMcpServer {
     private readonly logger = createLogger("PenpotMcpServer");
@@ -56,6 +57,7 @@ export class PenpotMcpServer {
             new PrintTextTool(this),
             new ExecuteCodeTool(this),
             new HighLevelOverviewTool(this),
+            new PenpotApiInfoTool(this),
         ];
 
         for (const tool of toolInstances) {

@@ -40,16 +40,19 @@ export class ExecuteCodeTool extends Tool<ExecuteCodeArgs> {
 
     public getToolDescription(): string {
         return (
-            "Executes JavaScript code in the Penpot plugin context. " +
-            "Two objects are available: `penpot` (the Penpot API) and `storage` (an object in which arbitrary " +
+            "Executes JavaScript code in the Penpot plugin context.\n" +
+            "IMPORTANT: Before using this tool, make sure you have read the 'Penpot High-Level Overview' and know " +
+            "which Penpot API functionality is necessary and how to use it.\n" +
+            "You have access two main objects: `penpot` (the Penpot API, of type `Penpot`) and `storage` (an object in which arbitrary " +
             "data can be stored, simply by adding a new attribute; stored attributes can be referenced in future calls " +
             "to this tool, so any intermediate results that could come in handy later should be stored in `storage` " +
             "instead of just a fleeting variable).\n" +
             "The tool call returns the value of the concluding `return` statement, if any.\n" +
             "Any output that you generate via the `console` object will be returned to you; so you may use this" +
-            "to track what your code is doing, but you should only do so only if there is an actual need!.\n" +
-            "In general, try a simple approach first, and only if it fails, try more complex code that involves " +
-            "handling different cases (in particular error cases)."
+            "to track what your code is doing, but you should only do so only if there is an actual need for this! " +
+            "IMPORTANT: Don't use logging prematurely!\n" +
+            "VERY IMPORTANT: In general, try a simple approach first, and only if it fails, try more complex code that involves " +
+            "handling different cases (in particular error cases) and that applies logging."
         );
     }
 

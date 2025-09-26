@@ -39,8 +39,9 @@ penpot-mcp/
 
 ### Adding a new Tool
 
-* Implement the tool class in `mcp-server/src/tools/` following the `Tool` interface. 
-* IMPORTANT: Do not catch any exceptions in the `executeCore` method. Let them propagate to be handled centrally.
+1. Implement the tool class in `mcp-server/src/tools/` following the `Tool` interface. 
+   IMPORTANT: Do not catch any exceptions in the `executeCore` method. Let them propagate to be handled centrally.
+2. Register the tool in `PenpotMcpServer`.
 
 Look at `PrintTextTool` as an example.
 

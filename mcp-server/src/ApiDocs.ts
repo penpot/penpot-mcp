@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 /**
- * Represents a single API type with its documentation.
+ * Represents a single type/interface defined in the Penpot API
  */
 export class ApiType {
     private readonly name: string;
@@ -22,6 +22,13 @@ export class ApiType {
      */
     getName(): string {
         return this.name;
+    }
+
+    /**
+     * Returns the overview text of this API type (which all signature/type declarations)
+     */
+    getOverviewText() {
+        return this.overview;
     }
 
     /**

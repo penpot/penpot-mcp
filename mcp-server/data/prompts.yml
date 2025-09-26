@@ -10,7 +10,7 @@ initial_instructions: |
   One of the key tools is the execute_code tool, which allows you to run JavaScript code using the Penpot Plugin API
   directly in the connected project.
   
-  When writing code, a key object is the `penpot` object which provides key functionality:
+  When writing code, a key object is the `penpot` object (which is of type `Penpot`). It provides useful functionality:
     * `penpot.selection` provides the list of elements the user has selected in the Penpot UI.
        If it is unclear which elements to work on, you can ask the user to select them for you.
     *  Generation of CSS content for elements: 
@@ -24,7 +24,7 @@ initial_instructions: |
           type?: "html" | "svg";
       }): string;
   
-  For example, to generate CSS for the selected elements, you can execute this:
+  For example, to generate CSS for the currently selected elements, you can execute this:
       return penpot.generateStyle(penpot.selection, { type: "css", withChildren: true });
   
   You have hereby read the 'Penpot High-Level Overview' and need not use a tool to read it again.
