@@ -40,7 +40,6 @@ npm run dev
 
 ## File Organization
 - Place new tools in `src/tools/` directory
-- Add interfaces to `src/interfaces/` if needed
 - Update main server registration in `src/index.ts`
 - Follow existing naming conventions
 

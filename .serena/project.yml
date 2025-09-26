@@ -73,7 +73,7 @@ initial_prompt: |
     clearly defines *what* it is. Any details then follow in subsequent sentences.
     
     When describing what blocks of code do, you also use an elliptical style and start with a lower-case letter unless
-    the comment is a lengthy explanation with at least to sentences (in which case you start with a capital letter, as is 
+    the comment is a lengthy explanation with at least two sentences (in which case you start with a capital letter, as is 
     required for sentences).
 
 

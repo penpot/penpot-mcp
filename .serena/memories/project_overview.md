@@ -14,7 +14,7 @@ This project is a Model Context Protocol (MCP) server for Penpot integration. It
 ## Project Structure
 ```
 penpot-mcp/
-├── common/                     # NEW: Shared type definitions
+├── common/                    # Shared type definitions
 │   ├── src/
 │   │   ├── index.ts           # Exports for shared types
 │   │   └── types.ts           # PluginTaskResult, request/response interfaces
@@ -24,20 +24,40 @@ penpot-mcp/
 │   │   ├── index.ts           # Main server entry point
 │   │   ├── PenpotMcpServer.ts # Enhanced with request/response correlation
 │   │   ├── PluginTask.ts      # Now supports result promises
-│   │   ├── tasks/             # Task implementations
-│   │   │   └── PrintTextPluginTask.ts # Uses shared types
+│   │   ├── tasks/             # PluginTask implementations
 │   │   └── tools/             # Tool implementations
-│   │       ├── HelloWorldTool.ts
-│   │       └── PrintTextTool.ts # Now waits for task completion
 │   └── package.json           # Includes @penpot-mcp/common dependency
-└── penpot-plugin/             # Penpot plugin with response capability
-    ├── src/
-    │   ├── main.ts            # Enhanced WebSocket handling with response forwarding
-    │   └── plugin.ts          # Now sends task responses back to server
-    └── package.json           # Includes @penpot-mcp/common dependency
+├── penpot-plugin/             # Penpot plugin with response capability
+│   ├── src/
+│   │   ├── main.ts            # Enhanced WebSocket handling with response forwarding
+│   │   └── plugin.ts          # Now sends task responses back to server
+│   └── package.json           # Includes @penpot-mcp/common dependency
+└── prepare-api-docs           # Python project for the generation of API docs
 ```
 
-## Key Components - Updated
+## Key Tasks
+
+### Adding a new Tool
+
+* Implement the tool class in `mcp-server/src/tools/` following the `Tool` interface. 
+* IMPORTANT: Do not catch any exceptions in the `executeCore` method. Let them propagate to be handled centrally.
+
+Look at `PrintTextTool` as an example.
+
+Many tools are linked to tasks that are handled in the plugin, i.e. they have an associated `PluginTask` implementation in `mcp-server/src/tasks/`.
+
+### Adding a new PluginTask
+
+1. Implement the input data interface for the task in `common/src/types.ts`.
+2. Implement the `PluginTask` class in `mcp-server/src/tasks/`.
+3. Implement the corresponding task handler class in the plugin (`penpot-plugin/src/task-handlers/`).
+    * In the success case, call `task.sendSuccess`.
+    * In the failure case, just throw an exception, which will be handled centrally!
+    * Look at `PrintTextTaskHandler` as an example.
+4. Register the task handler in `penpot-plugin/src/plugin.ts` in the `taskHandlers` list.
+
+
+## Key Components
 
 ### Enhanced WebSocket Protocol
 - **Request Format**: `{id: string, task: string, params: any}`
@@ -60,11 +80,11 @@ penpot-mcp/
 5. **Timeout Protection**: Tasks don't hang indefinitely (30s limit)
 6. **Request Correlation**: Unique IDs match requests to responses
 
-## Protocol Flow
+## Task Flow
+
 ```
 LLM Tool Call → MCP Server → WebSocket (Request) → Plugin → Penpot API
                     ↑                                  ↓
              Tool Response ← MCP Server ← WebSocket (Response) ← Plugin Result
 ```
 
-All components now properly handle the full request/response lifecycle with comprehensive error handling and type safety.
