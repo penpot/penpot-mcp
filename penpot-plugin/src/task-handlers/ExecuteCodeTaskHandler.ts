@@ -193,9 +193,15 @@ export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
         const context = this.context;
         const code = task.params.code;
 
-        const result = (function (ctx) {
+        let result: any = (function (ctx) {
             return Function(...Object.keys(ctx), code)(...Object.values(ctx));
         })(context);
+
+        // if the result is a Promise, await it
+        if (result instanceof Promise) {
+            console.log("Code execution returned a Promise, awaiting result...");
+            result = await result;
+        }
 
         console.log("Code execution result:", result);
 
