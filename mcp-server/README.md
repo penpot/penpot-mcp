@@ -28,8 +28,6 @@ A Model Context Protocol (MCP) server that provides Penpot integration capabilit
 
          npm start
 
-   A custom port can be specified: `npm start -- --port 8080`
-
 
 ### Summary of Commands
 

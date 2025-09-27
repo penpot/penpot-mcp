@@ -42,7 +42,7 @@ function connectToMcpServer(): void {
     }
 
     try {
-        ws = new WebSocket("ws://localhost:8080");
+        ws = new WebSocket("ws://localhost:4402");
         updateConnectionStatus("Connecting...", false);
 
         ws.onopen = () => {

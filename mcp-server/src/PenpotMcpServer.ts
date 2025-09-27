@@ -29,8 +29,8 @@ export class PenpotMcpServer {
     };
 
     constructor(
-        public port: number = 4401,
-        public webSocketPort: number = 8080,
+        private port: number = 4401,
+        private webSocketPort: number = 4402,
         replPort: number = 4403
     ) {
         this.configLoader = new ConfigurationLoader();

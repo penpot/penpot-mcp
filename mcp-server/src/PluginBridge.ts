@@ -14,7 +14,7 @@ export class PluginBridge {
     private readonly taskTimeouts: Map<string, NodeJS.Timeout> = new Map();
 
     constructor(
-        port: number,
+        private port: number,
         private taskTimeoutSecs: number = 30
     ) {
         this.wsServer = new WebSocketServer({ port: port });
@@ -53,7 +53,7 @@ export class PluginBridge {
             });
         });
 
-        this.logger.info("WebSocket server started on port 8080");
+        this.logger.info("WebSocket server started on port %d", this.port);
     }
 
     /**

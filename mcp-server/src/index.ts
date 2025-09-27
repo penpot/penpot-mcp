@@ -11,7 +11,7 @@ import { createLogger } from "./logger";
  *
  * Usage:
  * - Default port: node dist/index.js (runs on 4401)
- * - Custom port: node dist/index.js --port 8080
+ * - Custom port: node dist/index.js --port <port>
  * - Help: node dist/index.js --help
  */
 
