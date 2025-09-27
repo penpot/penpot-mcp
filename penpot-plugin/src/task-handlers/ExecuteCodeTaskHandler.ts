@@ -182,7 +182,7 @@ export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
         };
     }
 
-    handle(task: Task<ExecuteCodeTaskParams>): void {
+    async handle(task: Task<ExecuteCodeTaskParams>): Promise<void> {
         if (!task.params.code) {
             task.sendError("executeCode task requires 'code' parameter");
             return;

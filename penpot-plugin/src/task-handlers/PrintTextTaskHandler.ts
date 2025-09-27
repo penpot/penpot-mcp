@@ -7,7 +7,7 @@ import { PrintTextTaskParams } from "../../../common/src";
 export class PrintTextTaskHandler extends TaskHandler<PrintTextTaskParams> {
     readonly taskType = "printText";
 
-    handle(task: Task<PrintTextTaskParams>): void {
+    async handle(task: Task<PrintTextTaskParams>): Promise<void> {
         if (!task.params.text) {
             throw new Error("printText task requires 'text' parameter");
         }

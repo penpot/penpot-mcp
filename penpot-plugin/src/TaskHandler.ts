@@ -73,5 +73,5 @@ export abstract class TaskHandler<TParams = any> {
      *
      * @param task - The task to be handled
      */
-    abstract handle(task: Task<TParams>): void;
+    abstract handle(task: Task<TParams>): Promise<void>;
 }

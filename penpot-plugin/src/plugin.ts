@@ -28,7 +28,9 @@ penpot.ui.onMessage<string | { id: string; task: string; params: any }>((message
 
     // New request-based message handling
     if (typeof message === "object" && message.task && message.id) {
-        handlePluginTaskRequest(message);
+        handlePluginTaskRequest(message).catch((error) => {
+            console.error("Error in handlePluginTaskRequest:", error);
+        });
     }
 });
 
@@ -37,7 +39,7 @@ penpot.ui.onMessage<string | { id: string; task: string; params: any }>((message
  *
  * @param request - The task request containing ID, task type and parameters
  */
-function handlePluginTaskRequest(request: { id: string; task: string; params: any }): void {
+async function handlePluginTaskRequest(request: { id: string; task: string; params: any }): Promise<void> {
     console.log("Executing plugin task:", request.task, request.params);
     const task = new Task(request.id, request.task, request.params);
 
@@ -48,7 +50,7 @@ function handlePluginTaskRequest(request: { id: string; task: string; params: an
         try {
             // Cast the params to the expected type and handle the task
             console.log("Processing task with handler:", handler);
-            handler.handle(task);
+            await handler.handle(task);
 
             // check whether a response was sent and send a generic success if not
             if (!task.isResponseSent) {
