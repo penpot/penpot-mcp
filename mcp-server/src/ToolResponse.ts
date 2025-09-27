@@ -2,6 +2,7 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 type CallToolContent = CallToolResult["content"][number];
 type TextItem = Extract<CallToolContent, { type: "text" }>;
+type ImageItem = Extract<CallToolContent, { type: "image" }>;
 
 class TextContent implements TextItem {
     [x: string]: unknown;
@@ -9,12 +10,36 @@ class TextContent implements TextItem {
     constructor(public text: string) {}
 }
 
-export class TextResponse implements CallToolResult {
+class ImageContent implements ImageItem {
     [x: string]: unknown;
-    content: CallToolContent[]; // <- IMPORTANT: protocol’s union
-    constructor(text: string) {
-        this.content = [new TextContent(text)];
+    readonly type = "image" as const;
+
+    /**
+     * @param data - Base64-encoded image data
+     * @param mimeType - MIME type of the image (e.g., "image/png")
+     */
+    constructor(
+        public data: string,
+        public mimeType: string
+    ) {}
+}
+
+class PNGImageContent extends ImageContent {
+    constructor(data: Uint8Array) {
+        super(Buffer.from(data).toString("base64"), "image/png");
     }
 }
 
-export type ToolResponse = TextResponse;
+export class ToolResponse implements CallToolResult {
+    [x: string]: unknown;
+    content: CallToolContent[]; // <- IMPORTANT: protocol’s union
+    constructor(content: CallToolContent[]) {
+        this.content = content;
+    }
+}
+
+export class TextResponse extends ToolResponse {
+    constructor(text: string) {
+        super([new TextContent(text)]);
+    }
+}
