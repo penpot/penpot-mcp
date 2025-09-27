@@ -78,3 +78,18 @@ export interface ExecuteCodeTaskParams {
      */
     code: string;
 }
+
+/**
+ * Result data for the executeCode task.
+ */
+export interface ExecuteCodeTaskResultData<T> {
+    /**
+     * The result of the executed code, if any.
+     */
+    result: T;
+
+    /**
+     * Captured console output during code execution.
+     */
+    log: string;
+}

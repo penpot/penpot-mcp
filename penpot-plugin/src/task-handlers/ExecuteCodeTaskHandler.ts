@@ -1,5 +1,5 @@
 import { Task, TaskHandler } from "../TaskHandler";
-import { ExecuteCodeTaskParams } from "../../../common/src";
+import { ExecuteCodeTaskParams, ExecuteCodeTaskResultData } from "../../../common/src";
 
 /**
  * Console implementation that captures all log output for code execution.
@@ -205,10 +205,11 @@ export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
 
         console.log("Code execution result:", result);
 
-        // return both result and captured log
-        task.sendSuccess({
+        // return result and captured log
+        let resultData: ExecuteCodeTaskResultData<any> = {
             result: result,
             log: this.context.console.getLog(),
-        });
+        };
+        task.sendSuccess(resultData);
     }
 }
