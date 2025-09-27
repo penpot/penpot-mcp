@@ -2,6 +2,27 @@
 
 This system enables LLMs to interact with Penpot design projects through a Model Context Protocol (MCP) server and plugin architecture.
 
+## Quick Start
+
+If it's your first execution, install and build all components before starting:
+```shell
+npm install
+npm run install-all-and-start
+```
+
+Otherwise, just start all components:
+```shell
+npm run start
+```
+
+Then proceed with loading the plugin and connecting to the MCP server as described in [steps 3-4](#step-3-load-plugin-in-penpot)
+
+You can also install and build the components without starting them:
+```shell
+npm run install-all
+npm run build-all
+```
+
 ## Architecture
 
 The system consists of three main components:
@@ -33,7 +54,7 @@ LLM ← MCP Server ← WebSocket ← Penpot Plugin ← Result
 ```
 
 ### Request Format
-```typescript
+```
 {
   id: string,           // Unique UUID for correlation
   task: string,         // Task type (e.g., "printText")
@@ -42,7 +63,7 @@ LLM ← MCP Server ← WebSocket ← Penpot Plugin ← Result
 ```
 
 ### Response Format  
-```typescript
+```
 {
   id: string,           // Matching request ID
   result: {
@@ -54,6 +75,9 @@ LLM ← MCP Server ← WebSocket ← Penpot Plugin ← Result
 ```
 
 ## Testing the Connection
+
+For each component, run `npm install` before running other commands
+if you haven't installed the component in the past.
 
 ### Step 0: Build the common components
 

@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server that provides Penpot integration capabilit
 ## Prerequisites
 
 - Node.js (tested with v20+)
-- npm
+- npm (with npx on the PATH)
 
 ## Installation & Setup
 

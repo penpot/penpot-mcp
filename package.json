@@ -1,0 +1,20 @@
+{
+  "name": "penpot-mcp",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "install-all": "concurrently --names \"COMMON,MCP-SERVER,PLUGIN\" --prefix-colors \"green,cyan,magenta\" \"npm --prefix common install\" \"npm --prefix mcp-server install\" \"npm --prefix penpot-plugin install\"",
+    "build-all": "concurrently --names \"COMMON,MCP-SERVER,PLUGIN\" --prefix-colors \"green,cyan,magenta\" --success first \"npm --prefix common install && npm --prefix common run build\" \"npm --prefix mcp-server run build\" \"npm --prefix penpot-plugin run build\"",
+    "start": "concurrently --names \"MCP-SERVER,PLUGIN-SERVER\" --prefix-colors \"cyan,magenta\" --kill-others-on-fail \"npm --prefix mcp-server start\" \"npm --prefix penpot-plugin run dev\"",
+    "install-all-and-start": "npm run install-all && npm run build-all && concurrently --names \"MCP-SERVER,PLUGIN-SERVER\" --prefix-colors \"cyan,magenta\" --kill-others-on-fail \"npm --prefix mcp-server start\" \"npm --prefix penpot-plugin run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oraios/penpot-mcp.git"
+  },
+  "private": true,
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "kill-port": "^2.0.1"
+  }
+}
