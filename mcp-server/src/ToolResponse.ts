@@ -22,11 +22,27 @@ class ImageContent implements ImageItem {
         public data: string,
         public mimeType: string
     ) {}
+
+    /**
+     * @param data - PNG image data as Uint8Array or as object (from JSON conversion of Uint8Array)
+     */
+    protected static byteData(data: Uint8Array | object): Uint8Array {
+        if (typeof data === "object") {
+            // convert object (as obtained from JSON conversion of Uint8Array) back to Uint8Array
+            return new Uint8Array(Object.values(data) as number[]);
+        } else {
+            return data;
+        }
+    }
 }
 
 class PNGImageContent extends ImageContent {
-    constructor(data: Uint8Array) {
-        super(Buffer.from(data).toString("base64"), "image/png");
+    /**
+     * @param data - PNG image data as Uint8Array or as object (from JSON conversion of Uint8Array)
+     */
+    constructor(data: Uint8Array | object) {
+        let array = ImageContent.byteData(data);
+        super(Buffer.from(array).toString("base64"), "image/png");
     }
 }
 
@@ -41,5 +57,14 @@ export class ToolResponse implements CallToolResult {
 export class TextResponse extends ToolResponse {
     constructor(text: string) {
         super([new TextContent(text)]);
+    }
+}
+
+export class PNGResponse extends ToolResponse {
+    /**
+     * @param data - PNG image data as Uint8Array or as object (from JSON conversion of Uint8Array)
+     */
+    constructor(data: Uint8Array | object) {
+        super([new PNGImageContent(data)]);
     }
 }

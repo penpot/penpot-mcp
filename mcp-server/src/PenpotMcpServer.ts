@@ -11,6 +11,7 @@ import { createLogger } from "./logger";
 import { Tool } from "./Tool";
 import { HighLevelOverviewTool } from "./tools/HighLevelOverviewTool";
 import { PenpotApiInfoTool } from "./tools/PenpotApiInfoTool";
+import { ExportShapeTool } from "./tools/ExportShapeTool";
 
 export class PenpotMcpServer {
     private readonly logger = createLogger("PenpotMcpServer");
@@ -58,6 +59,7 @@ export class PenpotMcpServer {
             new ExecuteCodeTool(this),
             new HighLevelOverviewTool(this),
             new PenpotApiInfoTool(this),
+            new ExportShapeTool(this),
         ];
 
         for (const tool of toolInstances) {
