@@ -1,217 +1,354 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penpot MCP REPL</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <style>
-        body {
-            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        #code-input {
-            width: 100%;
-            min-height: 200px;
-            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            resize: vertical;
-            background-color: white;
-            box-sizing: border-box;
-        }
-        
-        #execute-btn {
-            background-color: #007acc;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 15px 0;
-            font-family: inherit;
-        }
-        
-        #execute-btn:hover {
-            background-color: #005a9e;
-        }
-        
-        #execute-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        
-        #results {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            background-color: white;
-            min-height: 100px;
-            white-space: pre-wrap;
-            font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
-            font-size: 14px;
-        }
-        
-        .error {
-            color: #d63031;
-            background-color: #fff5f5;
-            border-color: #f5c6cb;
-        }
-        
-        .success {
-            color: #00b894;
-            background-color: #f0fff4;
-            border-color: #c3e6cb;
-        }
-        
-        .loading {
-            color: #fdcb6e;
-            background-color: #fffbf0;
-            border-color: #ffeeba;
-        }
-        
-        .log-section {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-            color: #666;
-            font-style: italic;
-        }
-        
-        .controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin: 15px 0;
-        }
-        
-        .shortcut-hint {
-            color: #666;
-            font-size: 12px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Penpot MCP REPL</h1>
-    
-    <div>
-        <label for="code-input">JavaScript Code:</label>
-        <textarea id="code-input" placeholder="Enter your JavaScript code here...
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Penpot MCP REPL</title>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <style>
+            body {
+                font-family: "Consolas", "Monaco", "Lucida Console", monospace;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+
+            h1 {
+                color: #333;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .repl-container {
+                background-color: white;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 15px;
+                min-height: 400px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .repl-entry {
+                margin-bottom: 20px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 15px;
+            }
+
+            .repl-entry:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .input-section {
+                margin-bottom: 10px;
+            }
+
+            .input-label {
+                color: #007acc;
+                font-weight: bold;
+                margin-bottom: 5px;
+                display: block;
+            }
+
+            .code-input {
+                width: 100%;
+                min-height: 60px;
+                font-family: "Consolas", "Monaco", "Lucida Console", monospace;
+                font-size: 14px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 10px;
+                resize: vertical;
+                background-color: white;
+                box-sizing: border-box;
+            }
+
+            .code-input:read-only {
+                background-color: #f8f9fa;
+                border-color: #e9ecef;
+                color: #6c757d;
+            }
+
+            .code-input:focus {
+                outline: none;
+                border-color: #007acc;
+                box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.1);
+            }
+
+            .execute-btn {
+                background-color: #007acc;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                font-size: 14px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 10px;
+                font-family: inherit;
+            }
+
+            .execute-btn:hover {
+                background-color: #005a9e;
+            }
+
+            .execute-btn:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+
+            .output-section {
+                margin-top: 10px;
+            }
+
+            .output-label {
+                color: #28a745;
+                font-weight: bold;
+                margin-bottom: 5px;
+                display: block;
+            }
+
+            .log-output {
+                background-color: #f8f9fa;
+                border: 1px solid #e9ecef;
+                border-radius: 4px;
+                padding: 10px;
+                margin-bottom: 10px;
+                white-space: pre-wrap;
+                font-family: "Consolas", "Monaco", "Lucida Console", monospace;
+                font-size: 13px;
+                color: #495057;
+            }
+
+            .result-output {
+                background-color: #f0fff4;
+                border: 1px solid #c3e6cb;
+                border-radius: 4px;
+                padding: 10px;
+                white-space: pre-wrap;
+                font-family: "Consolas", "Monaco", "Lucida Console", monospace;
+                font-size: 14px;
+                color: #155724;
+            }
+
+            .error-output {
+                background-color: #fff5f5;
+                border: 1px solid #f5c6cb;
+                border-radius: 4px;
+                padding: 10px;
+                white-space: pre-wrap;
+                font-family: "Consolas", "Monaco", "Lucida Console", monospace;
+                font-size: 14px;
+                color: #721c24;
+            }
+
+            .loading-output {
+                background-color: #fffbf0;
+                border: 1px solid #ffeeba;
+                border-radius: 4px;
+                padding: 10px;
+                font-family: "Consolas", "Monaco", "Lucida Console", monospace;
+                font-size: 14px;
+                color: #856404;
+                font-style: italic;
+            }
+
+            .controls-hint {
+                text-align: center;
+                color: #666;
+                font-size: 12px;
+                margin-top: 15px;
+                font-style: italic;
+            }
+
+            .entry-number {
+                color: #666;
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Penpot MCP REPL</h1>
+
+        <div class="repl-container" id="repl-container">
+            <!-- REPL entries will be dynamically added here -->
+        </div>
+
+        <div class="controls-hint">Press Ctrl+Enter to execute code • Shift+Enter for new line</div>
+
+        <script>
+            $(document).ready(function () {
+                let isExecuting = false;
+                let entryCounter = 1;
+
+                // create the initial input entry
+                createNewEntry();
+
+                function createNewEntry() {
+                    const entryId = `entry-${entryCounter}`;
+                    const entryHtml = `
+                    <div class="repl-entry" id="${entryId}">
+                        <div class="entry-number">In [${entryCounter}]:</div>
+                        <div class="input-section">
+                            <textarea class="code-input" id="code-input-${entryCounter}" 
+                                     placeholder="Enter your JavaScript code here...
 // Example:
 console.log('Hello from Penpot!');
 return 'This will be the result';"></textarea>
-    </div>
-    
-    <div class="controls">
-        <button id="execute-btn">Execute Code</button>
-        <span class="shortcut-hint">Shortcut: Ctrl+Enter</span>
-    </div>
-    
-    <div>
-        <label for="results">Results:</label>
-        <div id="results">Click "Execute Code" to run your JavaScript...</div>
-    </div>
+                            <button class="execute-btn" id="execute-btn-${entryCounter}">Execute Code</button>
+                        </div>
+                    </div>
+                `;
 
-    <script>
-        $(document).ready(function() {
-            let isExecuting = false;
-            
-            function setExecuting(executing) {
-                isExecuting = executing;
-                $('#execute-btn').prop('disabled', executing);
-                $('#execute-btn').text(executing ? 'Executing...' : 'Execute Code');
-            }
-            
-            function displayResult(data, isError = false) {
-                const $results = $('#results');
-                $results.removeClass('error success loading');
-                
-                if (isError) {
-                    $results.addClass('error');
-                    $results.text('Error: ' + data.error);
-                } else {
-                    $results.addClass('success');
-                    
-                    let output = '';
-                    if (data.result !== undefined) {
-                        output = 'Result: ' + JSON.stringify(data.result, null, 2);
-                    } else {
-                        output = 'Code executed successfully (no return value)';
-                    }
-                    
-                    if (data.log && data.log.trim()) {
-                        output += '\n\nConsole Output:\n' + data.log;
-                    }
-                    
-                    $results.text(output);
+                    $("#repl-container").append(entryHtml);
+
+                    // bind events for this entry
+                    bindEntryEvents(entryCounter);
+
+                    // focus on the new input
+                    $(`#code-input-${entryCounter}`).focus();
+
+                    // auto-resize textarea
+                    $(`#code-input-${entryCounter}`).on("input", function () {
+                        this.style.height = "auto";
+                        this.style.height = Math.max(60, this.scrollHeight) + "px";
+                    });
+
+                    entryCounter++;
                 }
-            }
-            
-            function executeCode() {
-                if (isExecuting) return;
-                
-                const code = $('#code-input').val().trim();
-                if (!code) {
-                    displayResult({ error: 'Please enter some code to execute' }, true);
-                    return;
-                }
-                
-                setExecuting(true);
-                $('#results').removeClass('error success').addClass('loading').text('Executing code...');
-                
-                $.ajax({
-                    url: '/execute',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ code: code }),
-                    success: function(data) {
-                        displayResult(data, false);
-                    },
-                    error: function(xhr) {
-                        let errorData;
-                        try {
-                            errorData = JSON.parse(xhr.responseText);
-                        } catch {
-                            errorData = { error: 'Network error or invalid response' };
+
+                function bindEntryEvents(entryNum) {
+                    const $executeBtn = $(`#execute-btn-${entryNum}`);
+                    const $codeInput = $(`#code-input-${entryNum}`);
+
+                    // bind execute button click
+                    $executeBtn.on("click", () => executeCode(entryNum));
+
+                    // bind Ctrl+Enter keyboard shortcut
+                    $codeInput.on("keydown", function (e) {
+                        if (e.ctrlKey && e.key === "Enter") {
+                            e.preventDefault();
+                            executeCode(entryNum);
                         }
-                        displayResult(errorData, true);
-                    },
-                    complete: function() {
-                        setExecuting(false);
+                    });
+                }
+
+                function setExecuting(entryNum, executing) {
+                    isExecuting = executing;
+                    $(`#execute-btn-${entryNum}`).prop("disabled", executing);
+                    $(`#execute-btn-${entryNum}`).text(executing ? "Executing..." : "Execute Code");
+                }
+
+                function displayResult(entryNum, data, isError = false) {
+                    const $entry = $(`#entry-${entryNum}`);
+
+                    // remove any existing output
+                    $entry.find(".output-section").remove();
+
+                    // create output section
+                    const outputHtml = `
+                    <div class="output-section">
+                        <div class="output-label">Out [${entryNum}]:</div>
+                        <div class="output-content"></div>
+                    </div>
+                `;
+
+                    $entry.append(outputHtml);
+                    const $outputContent = $entry.find(".output-content");
+
+                    if (isError) {
+                        const errorHtml = `<div class="error-output">Error: ${data.error}</div>`;
+                        $outputContent.html(errorHtml);
+                    } else {
+                        let outputElements = "";
+
+                        // add log output if present
+                        if (data.log && data.log.trim()) {
+                            outputElements += `<div class="log-output">${escapeHtml(data.log)}</div>`;
+                        }
+
+                        // add result output
+                        let resultText;
+                        if (data.result !== undefined) {
+                            resultText = JSON.stringify(data.result, null, 2);
+                        } else {
+                            resultText = "(no return value)";
+                        }
+
+                        outputElements += `<div class="result-output">${escapeHtml(resultText)}</div>`;
+
+                        $outputContent.html(outputElements);
                     }
-                });
-            }
-            
-            // bind execute button click
-            $('#execute-btn').on('click', executeCode);
-            
-            // bind Ctrl+Enter keyboard shortcut
-            $('#code-input').on('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    executeCode();
+                }
+
+                function escapeHtml(text) {
+                    const div = document.createElement("div");
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+
+                function executeCode(entryNum) {
+                    if (isExecuting) return;
+
+                    const $codeInput = $(`#code-input-${entryNum}`);
+                    const code = $codeInput.val().trim();
+
+                    if (!code) {
+                        displayResult(entryNum, { error: "Please enter some code to execute" }, true);
+                        return;
+                    }
+
+                    setExecuting(entryNum, true);
+
+                    // show loading state
+                    const $entry = $(`#entry-${entryNum}`);
+                    $entry.find(".output-section").remove();
+
+                    const loadingHtml = `
+                    <div class="output-section">
+                        <div class="output-label">Out [${entryNum}]:</div>
+                        <div class="loading-output">Executing code...</div>
+                    </div>
+                `;
+                    $entry.append(loadingHtml);
+
+                    $.ajax({
+                        url: "/execute",
+                        method: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ code: code }),
+                        success: function (data) {
+                            displayResult(entryNum, data, false);
+
+                            // make the textarea read-only and remove the execute button
+                            $codeInput.prop("readonly", true);
+                            $(`#execute-btn-${entryNum}`).remove();
+
+                            // create a new entry for the next input
+                            createNewEntry();
+
+                            // scroll to the new entry
+                            const $container = $("#repl-container");
+                            $container.scrollTop($container[0].scrollHeight);
+                        },
+                        error: function (xhr) {
+                            let errorData;
+                            try {
+                                errorData = JSON.parse(xhr.responseText);
+                            } catch {
+                                errorData = { error: "Network error or invalid response" };
+                            }
+                            displayResult(entryNum, errorData, true);
+                        },
+                        complete: function () {
+                            setExecuting(entryNum, false);
+                        },
+                    });
                 }
             });
-            
-            // auto-resize textarea based on content
-            $('#code-input').on('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.max(200, this.scrollHeight) + 'px';
-            });
-        });
-    </script>
-</body>
+        </script>
+    </body>
 </html>

@@ -20,7 +20,6 @@ export class PenpotMcpServer {
     private readonly tools: Map<string, Tool<any>>;
     public readonly configLoader: ConfigurationLoader;
     private app: any;
-    private readonly port: number;
     public readonly pluginBridge: PluginBridge;
     private readonly replServer: ReplServer;
 
@@ -29,9 +28,12 @@ export class PenpotMcpServer {
         sse: {} as Record<string, SSEServerTransport>,
     };
 
-    constructor(port: number = 4401, webSocketPort: number = 8080) {
+    constructor(
+        public port: number = 4401,
+        public webSocketPort: number = 8080,
+        replPort: number = 4403
+    ) {
         this.configLoader = new ConfigurationLoader();
-        this.port = port;
 
         const instructions = this.configLoader.getInitialInstructions();
         this.server = new McpServer(
@@ -46,7 +48,7 @@ export class PenpotMcpServer {
 
         this.tools = new Map<string, Tool<any>>();
         this.pluginBridge = new PluginBridge(webSocketPort);
-        this.replServer = new ReplServer(this.pluginBridge);
+        this.replServer = new ReplServer(this.pluginBridge, replPort);
 
         this.registerTools();
     }
@@ -148,7 +150,7 @@ export class PenpotMcpServer {
                 this.logger.info(`Penpot MCP Server started on port ${this.port}`);
                 this.logger.info(`Modern Streamable HTTP endpoint: http://localhost:${this.port}/mcp`);
                 this.logger.info(`Legacy SSE endpoint: http://localhost:${this.port}/sse`);
-                this.logger.info("WebSocket server is on ws://localhost:8080");
+                this.logger.info(`WebSocket server is on ws://localhost:${this.webSocketPort}`);
 
                 // start the REPL server
                 await this.replServer.start();

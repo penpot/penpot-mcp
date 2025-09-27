@@ -8,9 +8,10 @@ import { createLogger } from "./logger";
 /**
  * Web-based REPL server for executing code through the PluginBridge.
  *
- * Provides a simple HTML interface on port 4403 that allows users to input
+ * Provides a REPL-style HTML interface that allows users to input
  * JavaScript code and execute it via ExecuteCodePluginTask instances.
- * The interface displays the result member of ExecuteCodeTaskResultData.
+ * The interface maintains command history, displays logs in &lt;pre&gt; tags,
+ * and shows results in visually separated blocks.
  */
 export class ReplServer {
     private readonly logger = createLogger("ReplServer");
@@ -43,7 +44,7 @@ export class ReplServer {
         this.app.get("/", (req, res) => {
             const __filename = fileURLToPath(import.meta.url);
             const __dirname = path.dirname(__filename);
-            const htmlPath = path.join(__dirname, 'static', 'repl.html');
+            const htmlPath = path.join(__dirname, "static", "repl.html");
             res.sendFile(htmlPath);
         });
 
@@ -77,8 +78,6 @@ export class ReplServer {
             }
         });
     }
-
-
 
     /**
      * Starts the REPL web server.
