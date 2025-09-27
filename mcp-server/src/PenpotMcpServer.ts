@@ -12,6 +12,7 @@ import { Tool } from "./Tool";
 import { HighLevelOverviewTool } from "./tools/HighLevelOverviewTool";
 import { PenpotApiInfoTool } from "./tools/PenpotApiInfoTool";
 import { ExportShapeTool } from "./tools/ExportShapeTool";
+import { ReplServer } from "./ReplServer";
 
 export class PenpotMcpServer {
     private readonly logger = createLogger("PenpotMcpServer");
@@ -21,6 +22,7 @@ export class PenpotMcpServer {
     private app: any;
     private readonly port: number;
     public readonly pluginBridge: PluginBridge;
+    private readonly replServer: ReplServer;
 
     private readonly transports = {
         streamable: {} as Record<string, StreamableHTTPServerTransport>,
@@ -44,6 +46,7 @@ export class PenpotMcpServer {
 
         this.tools = new Map<string, Tool<any>>();
         this.pluginBridge = new PluginBridge(webSocketPort);
+        this.replServer = new ReplServer(this.pluginBridge);
 
         this.registerTools();
     }
@@ -141,13 +144,28 @@ export class PenpotMcpServer {
         this.setupHttpEndpoints();
 
         return new Promise((resolve) => {
-            this.app.listen(this.port, () => {
+            this.app.listen(this.port, async () => {
                 this.logger.info(`Penpot MCP Server started on port ${this.port}`);
                 this.logger.info(`Modern Streamable HTTP endpoint: http://localhost:${this.port}/mcp`);
                 this.logger.info(`Legacy SSE endpoint: http://localhost:${this.port}/sse`);
                 this.logger.info("WebSocket server is on ws://localhost:8080");
+
+                // start the REPL server
+                await this.replServer.start();
+
                 resolve();
             });
         });
+    }
+
+    /**
+     * Stops the MCP server and associated services.
+     *
+     * Gracefully shuts down the REPL server and other components.
+     */
+    public async stop(): Promise<void> {
+        this.logger.info("Stopping Penpot MCP Server...");
+        await this.replServer.stop();
+        this.logger.info("Penpot MCP Server stopped");
     }
 }
