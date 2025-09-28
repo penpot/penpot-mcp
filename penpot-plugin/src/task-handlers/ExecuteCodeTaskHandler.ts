@@ -1,5 +1,6 @@
 import { Task, TaskHandler } from "../TaskHandler";
 import { ExecuteCodeTaskParams, ExecuteCodeTaskResultData } from "../../../common/src";
+import { PenpotUtils } from "../PenpotUtils.ts";
 
 /**
  * Console implementation that captures all log output for code execution.
@@ -179,6 +180,7 @@ export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
             penpot: penpot,
             storage: {},
             console: new ExecuteCodeTaskConsole(),
+            penpotUtils: PenpotUtils,
         };
     }
 
