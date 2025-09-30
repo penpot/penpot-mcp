@@ -12,7 +12,10 @@ import { ExecuteCodeTaskParams } from "@penpot-mcp/common";
  */
 export class ExecuteCodeArgs {
     static schema = {
-        code: z.string().min(1, "Code cannot be empty"),
+        code: z
+            .string()
+            .min(1, "Code cannot be empty")
+            .describe("The JavaScript code to execute in the plugin context."),
     };
 
     /**

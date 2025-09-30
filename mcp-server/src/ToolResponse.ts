@@ -26,7 +26,7 @@ class ImageContent implements ImageItem {
     /**
      * @param data - PNG image data as Uint8Array or as object (from JSON conversion of Uint8Array)
      */
-    protected static byteData(data: Uint8Array | object): Uint8Array {
+    public static byteData(data: Uint8Array | object): Uint8Array {
         if (typeof data === "object") {
             // convert object (as obtained from JSON conversion of Uint8Array) back to Uint8Array
             return new Uint8Array(Object.values(data) as number[]);
@@ -36,7 +36,7 @@ class ImageContent implements ImageItem {
     }
 }
 
-class PNGImageContent extends ImageContent {
+export class PNGImageContent extends ImageContent {
     /**
      * @param data - PNG image data as Uint8Array or as object (from JSON conversion of Uint8Array)
      */
