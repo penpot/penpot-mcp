@@ -52,8 +52,8 @@ export class ExecuteCodeTool extends Tool<ExecuteCodeArgs> {
             "instead of just a fleeting variable).\n" +
             "The tool call returns the value of the concluding `return` statement, if any.\n" +
             "Any output that you generate via the `console` object will be returned to you; so you may use this" +
-            "to track what your code is doing, but you should only do so only if there is an actual need for this! " +
-            "IMPORTANT: Don't use logging prematurely!\n" +
+            "to track what your code is doing, but you should only do so only if there is an ACTUAL NEED for this! " +
+            "VERY IMPORTANT: Don't use logging prematurely! NEVER log the data you are returning, as you will otherwise receive it twice!\n" +
             "VERY IMPORTANT: In general, try a simple approach first, and only if it fails, try more complex code that involves " +
             "handling different cases (in particular error cases) and that applies logging."
         );

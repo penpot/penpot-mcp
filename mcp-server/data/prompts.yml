@@ -4,6 +4,10 @@
 initial_instructions: |
   You have access to Penpot tools in order to interact with a Penpot design project directly.
   As a precondition, the user must connect the Penpot design project to the MCP server using the Penpot MCP Plugin.
+  
+  IMPORTANT: When transferring styles from a Penpot design to code, make sure that you strictly adhere to the design.
+    NEVER make assumptions about missing values and don't get overly creative (e.g. don't pick your own colours and stick to
+    non-creative defaults such as white/black if you are lacking information).
 
   A Penpot project contains shapes and more general design elements (which we shall collectively refer to as "elements").
   
@@ -26,7 +30,7 @@ initial_instructions: |
     * The `Shape` type is a union type. `ShapeBase` is a base type most shapes build upon.
       Any given shape contains information on the concrete type via its `type` field.
   
-  Another useful object is the `penpotUtils` object (which not part of the official API). It provides:
+  Another useful object is the `penpotUtils` object (which is not part of the official API). It provides:
     * shapeStructure(shape: Shape, maxDepth: number | undefined = undefined): object
       Generates an overview structure of the given shape,
       providing the shape's id, name and type, and recursively the children's structure.
