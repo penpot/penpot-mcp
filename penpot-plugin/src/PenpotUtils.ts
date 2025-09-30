@@ -1,4 +1,4 @@
-import { Shape } from "@penpot/plugin-types";
+import { Page, Shape } from "@penpot/plugin-types";
 
 export class PenpotUtils {
     /**
@@ -25,6 +25,33 @@ export class PenpotUtils {
             type: shape.type,
             children: children,
         };
+    }
+
+    /**
+     * Finds all shapes that matches the given predicate in the given shape tree.
+     *
+     * @param predicate - A function that takes a shape and returns true if it matches the criteria
+     * @param root - The root shape to start the search from (defaults to penpot.root)
+     */
+    public static findShapes(predicate: (shape: Shape) => boolean, root: Shape | null = penpot.root): Shape[] {
+        let result = new Array<Shape>();
+
+        let find = function (shape: Shape | null) {
+            if (!shape) {
+                return;
+            }
+            if (predicate(shape)) {
+                result.push(shape);
+            }
+            if ("children" in shape && shape.children) {
+                for (let child of shape.children) {
+                    find(child);
+                }
+            }
+        };
+
+        find(root);
+        return result;
     }
 
     /**
@@ -63,5 +90,22 @@ export class PenpotUtils {
      */
     public static findShapeById(id: string): Shape | null {
         return this.findShape((shape) => shape.id === id);
+    }
+
+    public static findPage(predicate: (page: Page) => boolean): Page | null {
+        let page = penpot.currentFile!.pages.find(predicate);
+        return page || null;
+    }
+
+    public static getPages(): { id: string; name: string }[] {
+        return penpot.currentFile!.pages.map((page) => ({ id: page.id, name: page.name }));
+    }
+
+    public static getPageById(id: string): Page | null {
+        return this.findPage((page) => page.id === id);
+    }
+
+    public static getPageByName(name: string): Page | null {
+        return this.findPage((page) => page.name.toLowerCase() === name.toLowerCase());
     }
 }
