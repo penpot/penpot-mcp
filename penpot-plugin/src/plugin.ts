@@ -11,22 +11,6 @@ penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}`);
 
 // Handle both legacy string messages and new request-based messages
 penpot.ui.onMessage<string | { id: string; task: string; params: any }>((message) => {
-    // Legacy string-based message handling
-    if (typeof message === "string") {
-        if (message === "create-text") {
-            const text = penpot.createText("Hello world!");
-
-            if (text) {
-                text.x = penpot.viewport.center.x;
-                text.y = penpot.viewport.center.y;
-
-                penpot.selection = [text];
-            }
-        }
-        return;
-    }
-
-    // New request-based message handling
     if (typeof message === "object" && message.task && message.id) {
         handlePluginTaskRequest(message).catch((error) => {
             console.error("Error in handlePluginTaskRequest:", error);

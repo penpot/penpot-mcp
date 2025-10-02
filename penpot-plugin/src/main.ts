@@ -77,12 +77,6 @@ function connectToMcpServer(): void {
     }
 }
 
-// Event handlers
-document.querySelector("[data-handler='create-text']")?.addEventListener("click", () => {
-    // send message to plugin.ts
-    parent.postMessage("create-text", "*");
-});
-
 document.querySelector("[data-handler='connect-mcp']")?.addEventListener("click", () => {
     connectToMcpServer();
 });
