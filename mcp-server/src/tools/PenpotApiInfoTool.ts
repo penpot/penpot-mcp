@@ -41,9 +41,9 @@ export class PenpotApiInfoTool extends Tool<PenpotApiInfoArgs> {
      *
      * @param mcpServer - The MCP server instance
      */
-    constructor(mcpServer: PenpotMcpServer) {
+    constructor(mcpServer: PenpotMcpServer, apiDocs: ApiDocs) {
         super(mcpServer, PenpotApiInfoArgs.schema);
-        this.apiDocs = new ApiDocs();
+        this.apiDocs = apiDocs;
     }
 
     public getToolName(): string {
@@ -51,7 +51,10 @@ export class PenpotApiInfoTool extends Tool<PenpotApiInfoArgs> {
     }
 
     public getToolDescription(): string {
-        return "Retrieves Penpot API documentation for types and their members";
+        return (
+            "Retrieves Penpot API documentation for types and their members." +
+            "Be sure to read the 'Penpot High-Level Overview' first."
+        );
     }
 
     protected async executeCore(args: PenpotApiInfoArgs): Promise<ToolResponse> {

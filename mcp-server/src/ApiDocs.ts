@@ -116,7 +116,7 @@ export class ApiDocs {
      * Returns all available type names.
      */
     getTypeNames(): string[] {
-        return Array.from(this.apiTypes.keys());
+        return Array.from(this.apiTypes.values()).map((type) => type.getName());
     }
 
     /**

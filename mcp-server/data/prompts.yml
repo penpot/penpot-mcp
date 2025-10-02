@@ -22,6 +22,8 @@ initial_instructions: |
   directly in the connected project.
   To execute code correctly, you need to understand the Penpot Plugin API. You can retrieve API documentation via 
   the `penpot_api_info` tool.
+  
+  This is the full list of types/interfaces in the Penpot API: $api_types
 
   When writing code, a key object is the `penpot` object (which is of type `Penpot`):
     * `penpot.selection` provides the list of shapes the user has selected in the Penpot UI.

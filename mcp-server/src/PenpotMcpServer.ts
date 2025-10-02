@@ -13,6 +13,7 @@ import { HighLevelOverviewTool } from "./tools/HighLevelOverviewTool";
 import { PenpotApiInfoTool } from "./tools/PenpotApiInfoTool";
 import { ExportShapeTool } from "./tools/ExportShapeTool";
 import { ReplServer } from "./ReplServer";
+import { ApiDocs } from "./ApiDocs";
 
 export class PenpotMcpServer {
     private readonly logger = createLogger("PenpotMcpServer");
@@ -22,6 +23,7 @@ export class PenpotMcpServer {
     private app: any;
     public readonly pluginBridge: PluginBridge;
     private readonly replServer: ReplServer;
+    private apiDocs: ApiDocs;
 
     private readonly transports = {
         streamable: {} as Record<string, StreamableHTTPServerTransport>,
@@ -34,15 +36,15 @@ export class PenpotMcpServer {
         replPort: number = 4403
     ) {
         this.configLoader = new ConfigurationLoader();
+        this.apiDocs = new ApiDocs();
 
-        const instructions = this.configLoader.getInitialInstructions();
         this.server = new McpServer(
             {
                 name: "penpot-mcp-server",
                 version: "1.0.0",
             },
             {
-                instructions: instructions,
+                instructions: this.getInitialInstructions(),
             }
         );
 
@@ -54,7 +56,9 @@ export class PenpotMcpServer {
     }
 
     public getInitialInstructions(): string {
-        return this.configLoader.getInitialInstructions();
+        let instructions = this.configLoader.getInitialInstructions();
+        instructions = instructions.replace("$api_types", this.apiDocs.getTypeNames().join(", "));
+        return instructions;
     }
 
     private registerTools(): void {
@@ -63,7 +67,7 @@ export class PenpotMcpServer {
             new PrintTextTool(this),
             new ExecuteCodeTool(this),
             new HighLevelOverviewTool(this),
-            new PenpotApiInfoTool(this),
+            new PenpotApiInfoTool(this, this.apiDocs),
             new ExportShapeTool(this),
         ];
 
