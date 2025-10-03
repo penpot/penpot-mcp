@@ -14,7 +14,7 @@ const statusElement = document.getElementById("connection-status");
 function updateConnectionStatus(status: string, isConnectedState: boolean): void {
     if (statusElement) {
         statusElement.textContent = status;
-        statusElement.style.color = isConnectedState ? "#4CAF50" : "#666";
+        statusElement.style.color = isConnectedState ? "#6911d4" : "#600";
     }
 }
 
