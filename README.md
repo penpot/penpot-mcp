@@ -1,9 +1,18 @@
 # The Penpot MCP Server
 
 This project enables LLMs to interact directly with Penpot design projects 
-through a Model Context Protocol (MCP) server and plugin architecture.
+using the Model Context Protocol (MCP), building on Penpot's Plugin API
+to facilitate design data retrieval, modification, and creation.
+
 
 ## Architecture
+
+The Penpot MCP server exposes tools to AI clients (LLMs), which support the retrieval
+of design data as well as the modification and creation of design elements.
+The MCP server communicates with Penpot via a dedicated Penpot MCP plugin,
+which connects to the MCP server via WebSocket.
+
+![Architecture](resources/architecture.png)
 
 This repository is a monorepo containing four main components:
 
@@ -22,10 +31,18 @@ This repository is a monorepo containing four main components:
    - Executes tasks in Penpot using the Plugin API  
    - Sends structured responses back to the server#
 
-4. **Helper Scripts** (`helper/`):
+4. **Helper Scripts** (`python-scripts/`):
    - Python scripts that prepare data for the MCP server (development use)
 
+The core components are written in TypeScript, rendering interactions with the
+Penpot Plugin API both natural and type-safe.
+
+
 ## Usage
+
+To use the Penpot MCP server, you must
+ * run the MCP server and connect your AI client to it,
+ * run the Penpot MCP plugin in Penpot and connect it to the MCP server.
 
 ### Build & Launch the MCP Server and the Plugin Server
 
@@ -86,12 +103,14 @@ allowing clients that support only stdio to connect to the MCP server indirectly
 #### Example: Claude Desktop
 
 For Claude Desktop integration, you will need to use a proxy like `mcp-remote` since it only supports stdio transport.
-So install it as described above.
+Install `mcp-remote` as described above.
 
 To add the server to Claude Desktop's configuration, locate the configuration file:
 
 - **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+Add a `penpot` entry under `mcpServers` with the following content: 
 
 ```json
 {
