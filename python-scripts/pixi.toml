@@ -1,8 +1,8 @@
 [project]
-authors = ["Dominik Jain <dominik.jain@outlook.com>"]
+authors = ["Oraios AI <info@oraios-ai.de>"]
 channels = ["conda-forge"]
-description = "Add a short description here"
-name = "prepare-api-docs"
+description = "Scripts supporting the development of the Penpot MCP server"
+name = "penpot-mcp-scripts"
 platforms = ["win-64"]
 version = "0.1.0"
 

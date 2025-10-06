@@ -1,122 +1,111 @@
 # The Penpot MCP Server
 
-This system enables LLMs to interact with Penpot design projects through a Model Context Protocol (MCP) server and plugin architecture.
-
-## Quick Start
-
-If it's your first execution, install and build all components before starting:
-```shell
-npm install
-npm run install-all-and-start
-```
-
-Otherwise, just start all components:
-```shell
-npm run start
-```
-
-Then proceed with loading the plugin and connecting to the MCP server as described in [steps 3-4](#step-3-load-plugin-in-penpot)
-
-You can also install and build the components without starting them:
-```shell
-npm run install-all
-npm run build-all
-```
+This project enables LLMs to interact directly with Penpot design projects 
+through a Model Context Protocol (MCP) server and plugin architecture.
 
 ## Architecture
 
-The system consists of three main components:
+This repository is a monorepo containing four main components:
 
 1. **Common Types** (`common/`): 
    - Shared TypeScript definitions for request/response protocol
    - Ensures type safety across server and plugin components
-   - Defines `PluginTaskResult`, request/response interfaces, and task parameters
 
-2. **MCP Server** (`mcp-server/`): 
+2. **Penpot MCP Server** (`mcp-server/`): 
    - Provides MCP tools to LLMs for Penpot interaction
-   - Runs WebSocket server accepting connections from Penpot plugins
+   - Runs a WebSocket server accepting connections from the Penpot MCP plugin
    - Implements request/response correlation with unique task IDs
    - Handles task timeouts and proper error reporting
 
-3. **Penpot Plugin** (`penpot-plugin/`):
-   - Connects to MCP server via WebSocket
+3. **Penpot MCP Plugin** (`penpot-plugin/`):
+   - Connects to the MCP server via WebSocket
    - Executes tasks in Penpot using the Plugin API  
-   - Sends structured responses back to server with success/failure status
+   - Sends structured responses back to the server#
 
-## Protocol Flow
+4. **Helper Scripts** (`helper/`):
+   - Python scripts that prepare data for the MCP server (development use)
 
-```
-LLM → MCP Server → WebSocket → Penpot Plugin → Penpot API
-     ↓                      ↓               ↓
-   Tool Call          Task Request    Execute Action
-     ↑                      ↑               ↑
-LLM ← MCP Server ← WebSocket ← Penpot Plugin ← Result
-```
+## Usage
 
-### Request Format
-```
-{
-  id: string,           // Unique UUID for correlation
-  task: string,         // Task type (e.g., "printText")
-  params: object        // Task-specific parameters
-}
+### Build & Launch the MCP Server and the Plugin Server
+
+If it's your first execution, install the required dependencies:
+```shell
+npm install
 ```
 
-### Response Format  
-```
-{
-  id: string,           // Matching request ID
-  result: {
-    success: boolean,   // Task completion status
-    error?: string,     // Error message if failed
-    data?: any         // Optional result data
-  }
-}
+Then build all components and start them:
+```shell
+npm run bootstrap
 ```
 
-## Testing the Connection
+This bootstrap command will: 
+  * install dependencies for all components (`npm run install:all`)
+  * build all components (`npm run build:all`)
+  * start all components (`npm run start:all`)
 
-For each component, run `npm install` before running other commands
-if you haven't installed the component in the past.
 
-### Step 0: Build the common components
-
-```bash
-cd common
-npm run build
-```
-
-### Step 1: Start the MCP Server
-
-```bash
-cd mcp-server
-npm run build
-npm start
-```
-
-### Step 2: Build and Run the Plugin
-
-```bash
-cd penpot-plugin
-npm run build
-npm run dev
-```
-
-### Step 3: Load Plugin in Penpot
+### Load the Plugin in Penpot and Establish the Connection
 
 1. Open Penpot in your browser
 2. Navigate to a design file
-3. Go to Plugins menu
-4. Load the plugin using the development URL (typically `http://localhost:4400/manifest.json`)
+3. Open the Plugins menu
+4. Load the plugin using the development URL (`http://localhost:4400/manifest.json` by default)
 5. Open the plugin UI
+6. In the plugin UI, click "Connect to MCP server".
+   The connection status should change from "Not connected" to "Connected to MCP server".  
+   (Check the browser's developer console for WebSocket connection logs.
+   Check the MCP server terminal for WebSocket connection messages.)
 
-### Step 4: Test the Connection
+### Connecting an MCP Client
 
-1. In the plugin UI, click "Connect to MCP server"
-2. The connection status should change from "Not connected" to "Connected to MCP server"
-3. Check the browser's developer console for WebSocket connection logs
-4. Check the MCP server terminal for WebSocket connection messages
+By default, the server runs on port 4401 and provides:
 
-### Step 5: Use an MCP Client to Interact with the Penpot Project
+- **Modern Streamable HTTP endpoint**: `http://localhost:4401/mcp`
+- **Legacy SSE endpoint**: `http://localhost:4401/sse`
 
-See [MCP Server README](mcp-server/README.md)
+These endpoints can be used directly by MCP clients that support them.
+Simply configure the client to the MCP server by providing the respective URL.
+
+When using a client that only supports stdio transport,
+a proxy like `mcp-remote` is required.
+
+#### Using a Proxy for stdio Transport
+
+The `mcp-remote` package can proxy stdio transport to HTTP/SSE, 
+allowing clients that support only stdio to connect to the MCP server indirectly.
+
+1. Install `mcp-remote` globally if you haven't already:
+
+        npm install -g mcp-remote
+
+2. Use `mcp-remote` to provide the launch command for your MCP client:
+
+        npx -y mcp-remote http://localhost:4401/sse --allow-http
+
+#### Example: Claude Desktop
+
+For Claude Desktop integration, you will need to use a proxy like `mcp-remote` since it only supports stdio transport.
+So install it as described above.
+
+To add the server to Claude Desktop's configuration, locate the configuration file:
+
+- **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+```json
+{
+    "mcpServers": {
+        "penpot": {
+            "command": "npx",
+            "args": ["-y", "mcp-remote", "http://localhost:4401/sse", "--allow-http"]
+        }
+    }
+}
+```
+
+After updating the configuration file, restart Claude Desktop completely for the changes to take effect.
+Be sure to fully quit the app! On Windows, right-click the tray icon and select "Quit".
+
+After the restart, you should see the MCP server listed when clicking on the "Search and tools" icon at the bottom
+of the prompt input area.

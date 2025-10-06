@@ -10,9 +10,10 @@
         "format:check": "prettier --check ."
     },
     "dependencies": {
+        "@penpot-mcp/common": "file:../common",
         "@penpot/plugin-styles": "1.3.2",
         "@penpot/plugin-types": "1.3.2",
-        "@penpot-mcp/common": "file:../common"
+        "penpot-mcp": "file:.."
     },
     "devDependencies": {
         "prettier": "^3.0.0",
