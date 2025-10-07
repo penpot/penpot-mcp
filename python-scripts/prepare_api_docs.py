@@ -1,3 +1,4 @@
+import collections
 import dataclasses
 import os
 from dataclasses import dataclass
@@ -17,6 +18,7 @@ log = logging.getLogger(__name__)
 class PenpotAPIContentMarkdownConverter(MarkdownConverter):
     """
     Markdown converter for Penpot API docs, specifically for the .col-content element
+    (and sub-elements thereof)
     """
     def process_tag(self, node, parent_tags=None):
         soup = BeautifulSoup(str(node), "html.parser")
@@ -82,9 +84,13 @@ class TypeInfo:
     mapping from member type (e.g. "Properties", "Methods") to a mapping of member name to markdown description
     """
 
+    def add_referencing_types(self, referencing_types: set[str]):
+        if referencing_types:
+            self.overview += "\n\nReferenced by: " + ", ".join(sorted(referencing_types))
+
 
 class YamlConverter:
-    """Convert dictionaries to YAML with all strings in block literal style"""
+    """Converts dictionaries to YAML with all strings in block literal style"""
 
     def __init__(self):
         self.yaml = YAML()
@@ -118,11 +124,12 @@ class PenpotAPIDocsProcessor:
         self.md_converter = PenpotAPIContentMarkdownConverter()
         self.base_url = "https://penpot-plugins-api-doc.pages.dev"
         self.types: dict[str, TypeInfo] = {}
+        self.type_referenced_by: dict[str, set[str]] = collections.defaultdict(set)
 
     def run(self, target_dir: str):
         os.makedirs(target_dir, exist_ok=True)
 
-        # find links
+        # find links to all interfaces and types
         modules_page = self._fetch("modules")
         soup = BeautifulSoup(modules_page, "html.parser")
         content = soup.find(attrs={"class": "col-content"})
@@ -134,8 +141,13 @@ class PenpotAPIDocsProcessor:
             if href.startswith("interfaces/") or href.startswith("types/"):
                 type_name = href.split("/")[-1].replace(".html", "")
                 log.info("Processing page: %s", type_name)
-                type_info = self._process_page(href)
+                type_info = self._process_page(href, type_name)
                 self.types[type_name] = type_info
+
+        # add type reference information
+        for type_name, type_info in self.types.items():
+            referencing_types = self.type_referenced_by.get(type_name, set())
+            type_info.add_referencing_types(referencing_types)
 
         # save to yaml
         yaml_path = os.path.join(target_dir, "api_types.yml")
@@ -155,7 +167,7 @@ class PenpotAPIDocsProcessor:
         md = md.replace("\xa0", " ")  # replace non-breaking spaces
         return md.strip()
 
-    def _process_page(self, rel_url: str) -> TypeInfo:
+    def _process_page(self, rel_url: str, type_name: str) -> TypeInfo:
         html_content = self._fetch(rel_url)
         soup = BeautifulSoup(html_content, "html.parser")
 
@@ -177,6 +189,12 @@ class PenpotAPIDocsProcessor:
                         member_name = member_anchor.attrs["id"]
                         member_tag.find("h3").decompose()  # remove heading
                         members_in_group[member_name] = self._html_to_markdown(str(member_tag))
+
+        # record references to other types in signature
+        signature = content.find("div", attrs={"class": "tsd-signature"})
+        for link_to_type in signature.find_all("a", attrs={"class": "tsd-signature-type"}):
+            referenced_type_name = link_to_type.get_text().strip()
+            self.type_referenced_by[referenced_type_name].add(type_name)
 
         # remove the member groups from the soup
         for tag in member_group_tags:

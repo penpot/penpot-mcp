@@ -885,6 +885,8 @@ ActiveUser:
 
     * User
       + ActiveUser
+
+    Referenced by: Context, Penpot
   members:
     Properties:
       position: |-
@@ -983,6 +985,8 @@ Blur:
         hidden?: boolean; 
     }
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Path, Rectangle, ShapeBase, SvgRaw, Text
   members:
     Properties:
       id: |-
@@ -1133,6 +1137,8 @@ Board:
 
     * ShapeBase
       + Board
+
+    Referenced by: CloseOverlay, CommentThread, Context, ContextTypesUtils, Flow, NavigateTo, OpenOverlay, OverlayAction, Page, Penpot, RulerGuide, Shape, ToggleOverlay
   members:
     Properties:
       type: |-
@@ -1986,6 +1992,8 @@ Boolean:
 
     * ShapeBase
       + Boolean
+
+    Referenced by: Context, ContextTypesUtils, Penpot, Shape
   members:
     Properties:
       type: |-
@@ -2656,6 +2664,8 @@ CloseOverlay:
         animation: Animation; 
     }
     ```
+
+    Referenced by: Action
   members:
     Properties:
       type: |-
@@ -2698,6 +2708,8 @@ Color:
         image?: ImageData; 
     }
     ```
+
+    Referenced by: Context, Penpot, Shadow
   members:
     Properties:
       id: |-
@@ -2781,6 +2793,8 @@ ColorShapeInfo:
         shapesInfo: ColorShapeInfoEntry[]; 
     }
     ```
+
+    Referenced by: Context, Penpot
   members:
     Properties:
       shapesInfo: |-
@@ -2803,6 +2817,8 @@ ColorShapeInfoEntry:
         shapeId: string; 
     }
     ```
+
+    Referenced by: ColorShapeInfo
   members:
     Properties:
       property: |-
@@ -2840,6 +2856,8 @@ Comment:
         remove(): void; 
     }
     ```
+
+    Referenced by: CommentThread
   members:
     Properties:
       user: |-
@@ -2890,6 +2908,8 @@ CommentThread:
         remove(): void; 
     }
     ```
+
+    Referenced by: Page
   members:
     Properties:
       seqNumber: |-
@@ -3861,6 +3881,8 @@ ContextGeometryUtils:
         }; 
     }
     ```
+
+    Referenced by: ContextUtils
   members:
     Methods:
       center: |-
@@ -3912,6 +3934,8 @@ ContextTypesUtils:
         isSVG(shape: Shape): shape is SvgRaw; 
     }
     ```
+
+    Referenced by: ContextUtils
   members:
     Methods:
       isBoard: |-
@@ -4062,6 +4086,8 @@ ContextUtils:
         types: ContextTypesUtils; 
     }
     ```
+
+    Referenced by: Penpot
   members:
     Properties:
       geometry: |-
@@ -4107,6 +4133,8 @@ Dissolve:
             | "ease-in-out"; 
     }
     ```
+
+    Referenced by: Animation
   members:
     Properties:
       type: |-
@@ -4240,6 +4268,8 @@ Ellipse:
 
     * ShapeBase
       + Ellipse
+
+    Referenced by: Context, ContextTypesUtils, Penpot, Shape
   members:
     Properties:
       type: |-
@@ -4857,6 +4887,8 @@ EventsMap:
         contentsave: void; 
     }
     ```
+
+    Referenced by: Context, Penpot
   members:
     Properties:
       pagechange: |-
@@ -4923,6 +4955,8 @@ Export:
         skipChildren?: boolean; 
     }
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Path, Rectangle, ShapeBase, SvgRaw, Text
   members:
     Properties:
       type: |-
@@ -4985,6 +5019,8 @@ File:
 
     * PluginData
       + File
+
+    Referenced by: Context, EventsMap, Penpot
   members:
     Properties:
       id: |-
@@ -5189,6 +5225,8 @@ FileVersion:
         pin(): Promise<FileVersion>; 
     }
     ```
+
+    Referenced by: File, FileVersion
   members:
     Properties:
       label: |-
@@ -5259,6 +5297,8 @@ Fill:
         fillImage?: ImageData; 
     }
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, LibraryColor, Path, Rectangle, ShapeBase, SvgRaw, Text, TextRange
   members:
     Properties:
       fillColor: |-
@@ -5360,6 +5400,8 @@ FlexLayout:
 
     * CommonLayout
       + FlexLayout
+
+    Referenced by: Board
   members:
     Properties:
       alignItems: |-
@@ -5574,6 +5616,8 @@ Flow:
         remove(): void; 
     }
     ```
+
+    Referenced by: Page
   members:
     Properties:
       page: |-
@@ -5624,6 +5668,8 @@ Font:
         applyToRange(range: TextRange, variant?: FontVariant): void; 
     }
     ```
+
+    Referenced by: FontsContext, LibraryTypography
   members:
     Properties:
       name: |-
@@ -5727,6 +5773,8 @@ FontVariant:
         fontStyle: "normal" | "italic"; 
     }
     ```
+
+    Referenced by: Font, LibraryTypography
   members:
     Properties:
       name: |-
@@ -5770,6 +5818,8 @@ FontsContext:
         findAllByName(name: string): Font[]; 
     }
     ```
+
+    Referenced by: Context, Penpot
   members:
     Properties:
       all: |-
@@ -5925,6 +5975,8 @@ GridLayout:
 
     * CommonLayout
       + GridLayout
+
+    Referenced by: Board
   members:
     Properties:
       alignItems: |-
@@ -6414,6 +6466,8 @@ Group:
 
     * ShapeBase
       + Group
+
+    Referenced by: Context, ContextTypesUtils, Penpot, Shape
   members:
     Properties:
       type: |-
@@ -7092,6 +7146,8 @@ GuideColumn:
         params: GuideColumnParams; 
     }
     ```
+
+    Referenced by: Guide
   members:
     Properties:
       type: |-
@@ -7137,6 +7193,8 @@ GuideColumnParams:
         gutter?: number; 
     }
     ```
+
+    Referenced by: GuideColumn, GuideRow
   members:
     Properties:
       color: |-
@@ -7202,6 +7260,8 @@ GuideRow:
         params: GuideColumnParams; 
     }
     ```
+
+    Referenced by: Guide
   members:
     Properties:
       type: |-
@@ -7238,6 +7298,8 @@ GuideSquare:
         params: GuideSquareParams; 
     }
     ```
+
+    Referenced by: Guide
   members:
     Properties:
       type: |-
@@ -7275,6 +7337,8 @@ GuideSquareParams:
         size?: number; 
     }
     ```
+
+    Referenced by: GuideSquare
   members:
     Properties:
       color: |-
@@ -7305,6 +7369,8 @@ HistoryContext:
         undoBlockFinish(blockId: Symbol): void; 
     }
     ```
+
+    Referenced by: Context, Penpot
   members:
     Methods:
       undoBlockBegin: |-
@@ -7443,6 +7509,8 @@ Image:
 
     * ShapeBase
       + Image
+
+    Referenced by: Shape
   members:
     Properties:
       type: |-
@@ -8052,6 +8120,8 @@ Interaction:
         remove(): void; 
     }
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Path, Rectangle, ShapeBase, SvgRaw, Text
   members:
     Properties:
       shape: |-
@@ -8179,6 +8249,8 @@ LayoutChildProperties:
         minHeight: null | number; 
     }
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Path, Rectangle, ShapeBase, SvgRaw, Text
   members:
     Properties:
       absolute: |-
@@ -8332,6 +8404,8 @@ Library:
 
     * PluginData
       + Library
+
+    Referenced by: LibraryContext
   members:
     Properties:
       id: |-
@@ -8581,6 +8655,8 @@ LibraryColor:
 
     * LibraryElement
       + LibraryColor
+
+    Referenced by: Library
   members:
     Properties:
       color: |-
@@ -8814,6 +8890,8 @@ LibraryComponent:
 
     * LibraryElement
       + LibraryComponent
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Library, Path, Rectangle, ShapeBase, SvgRaw, Text
   members:
     Properties:
       id: |-
@@ -9184,6 +9262,8 @@ LibrarySummary:
         numTypographies: number; 
     }
     ```
+
+    Referenced by: LibraryContext
   members:
     Properties:
       id: |-
@@ -9259,6 +9339,8 @@ LibraryTypography:
 
     * LibraryElement
       + LibraryTypography
+
+    Referenced by: Library, Text, TextRange
   members:
     Properties:
       id: |-
@@ -9542,6 +9624,8 @@ LocalStorage:
         getKeys(): string[]; 
     }
     ```
+
+    Referenced by: Context, Penpot
   members:
     Methods:
       getItem: |-
@@ -9606,6 +9690,8 @@ NavigateTo:
         animation?: Animation; 
     }
     ```
+
+    Referenced by: Action
   members:
     Properties:
       type: |-
@@ -9664,6 +9750,8 @@ OpenOverlay:
 
     * OverlayAction
       + OpenOverlay
+
+    Referenced by: Action
   members:
     Properties:
       type: |-
@@ -9735,6 +9823,8 @@ OpenUrl:
         url: string; 
     }
     ```
+
+    Referenced by: Action
   members:
     Properties:
       type: |-
@@ -9886,6 +9976,8 @@ Page:
 
     * PluginData
       + Page
+
+    Referenced by: Context, EventsMap, File, Flow, Penpot
   members:
     Properties:
       id: |-
@@ -10310,6 +10402,8 @@ Path:
 
     * ShapeBase
       + Path
+
+    Referenced by: Context, ContextTypesUtils, Penpot, Shape
   members:
     Properties:
       type: |-
@@ -10967,6 +11061,8 @@ PathCommand:
         }; 
     }
     ```
+
+    Referenced by: Boolean, Path
   members:
     Properties:
       command: |-
@@ -11229,6 +11325,8 @@ PreviousScreen:
         type: "previous-screen"; 
     }
     ```
+
+    Referenced by: Action
   members:
     Properties:
       type: |-
@@ -11261,6 +11359,8 @@ Push:
             | "ease-in-out"; 
     }
     ```
+
+    Referenced by: Animation
   members:
     Properties:
       type: |-
@@ -11404,6 +11504,8 @@ Rectangle:
 
     * ShapeBase
       + Rectangle
+
+    Referenced by: Context, ContextTypesUtils, Penpot, Shape
   members:
     Properties:
       type: |-
@@ -12014,6 +12116,8 @@ RulerGuide:
         board?: Board; 
     }
     ```
+
+    Referenced by: Board, Page
   members:
     Properties:
       orientation: |-
@@ -12055,6 +12159,8 @@ Shadow:
         color?: Color; 
     }
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Path, Rectangle, ShapeBase, SvgRaw, Text
   members:
     Properties:
       id: |-
@@ -12837,6 +12943,8 @@ Slide:
             | "ease-in-out"; 
     }
     ```
+
+    Referenced by: Animation
   members:
     Properties:
       type: |-
@@ -12913,6 +13021,8 @@ Stroke:
         strokeColorGradient?: Gradient; 
     }
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, LibraryColor, Path, Rectangle, ShapeBase, SvgRaw, Text
   members:
     Properties:
       strokeColor: |-
@@ -13089,6 +13199,8 @@ SvgRaw:
 
     * ShapeBase
       + SvgRaw
+
+    Referenced by: ContextTypesUtils, Shape
   members:
     Properties:
       id: |-
@@ -13831,6 +13943,8 @@ Text:
 
     * ShapeBase
       + Text
+
+    Referenced by: Context, ContextTypesUtils, Font, Penpot, Shape, TextRange
   members:
     Properties:
       id: |-
@@ -14650,6 +14764,8 @@ TextRange:
         applyTypography(typography: LibraryTypography): void; 
     }
     ```
+
+    Referenced by: Font, LibraryTypography, Text
   members:
     Properties:
       shape: |-
@@ -14830,6 +14946,8 @@ ToggleOverlay:
 
     * OverlayAction
       + ToggleOverlay
+
+    Referenced by: Action
   members:
     Properties:
       destination: |-
@@ -14902,6 +15020,8 @@ Track:
         value: null | number; 
     }
     ```
+
+    Referenced by: GridLayout
   members:
     Properties:
       type: |-
@@ -14944,6 +15064,8 @@ User:
 
     * User
       + ActiveUser
+
+    Referenced by: Comment, CommentThread, Context, File, FileVersion, Penpot
   members:
     Properties:
       id: |-
@@ -15019,6 +15141,8 @@ Viewport:
         zoomIntoView(shapes: Shape[]): void; 
     }
     ```
+
+    Referenced by: Context, Penpot
   members:
     Properties:
       center: |-
@@ -15085,6 +15209,8 @@ Action:
     ```
 
     Type for all the possible types of actions in an interaction.
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Interaction, Path, Rectangle, ShapeBase, SvgRaw, Text
   members: {}
 Animation:
   overview: |-
@@ -15096,6 +15222,8 @@ Animation:
     ```
 
     Type of all the animations that can be added to an interaction.
+
+    Referenced by: CloseOverlay, NavigateTo, OpenOverlay, OverlayAction, ToggleOverlay
   members: {}
 BooleanType:
   overview: |-
@@ -15112,6 +15240,8 @@ BooleanType:
 
     Represents the boolean operation types available in Penpot.
     These types define how shapes can be combined or modified using boolean operations.
+
+    Referenced by: Context, Penpot
   members: {}
 Bounds:
   overview: |-
@@ -15149,6 +15279,8 @@ Bounds:
     ```
     const bounds = { x: 50, y: 50, width: 200, height: 100 };console.log(bounds);
     ```
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Path, Rectangle, ShapeBase, SvgRaw, Text, Viewport
   members: {}
 Gradient:
   overview: |-
@@ -15205,6 +15337,8 @@ Gradient:
     * stops: {     color: string;     opacity?: number;     offset: number; }[]
 
       An array of color stops that define the gradient.
+
+    Referenced by: Color, Fill, LibraryColor, Stroke
   members: {}
 Guide:
   overview: |-
@@ -15217,6 +15351,8 @@ Guide:
 
     Represents a board guide in Penpot.
     This type can be one of several specific board guide types: column, row, or square.
+
+    Referenced by: Board
   members: {}
 ImageData:
   overview: |-
@@ -15258,6 +15394,8 @@ ImageData:
 
       Whether to keep the aspect ratio of the image when resizing.
       Defaults to false if omitted.
+
+    Referenced by: Color, Context, Fill, LibraryColor, Penpot
   members: {}
 LibraryContext:
   overview: |-
@@ -15331,6 +15469,8 @@ LibraryContext:
         ```
         const connectedLibrary = await libraryContext.connectLibrary('library-id');
         ```
+
+    Referenced by: Context, Penpot
   members: {}
 Point:
   overview: |-
@@ -15345,6 +15485,8 @@ Point:
     ```
 
     Point represents a point in 2D space, typically with x and y coordinates.
+
+    Referenced by: Board, Boolean, CommentThread, Ellipse, Group, Image, OpenOverlay, OverlayAction, Page, Path, Rectangle, ShapeBase, SvgRaw, Text, ToggleOverlay, Viewport
   members: {}
 RulerGuideOrientation:
   overview: |-
@@ -15354,6 +15496,8 @@ RulerGuideOrientation:
     ```
     RulerGuideOrientation: "horizontal" | "vertical"
     ```
+
+    Referenced by: Board, Page, RulerGuide
   members: {}
 Shape:
   overview: |-
@@ -15380,6 +15524,8 @@ Shape:
     ```
     let shape: Shape;if (penpot.utils.types.isRectangle(shape)) {  console.log(shape.type);}
     ```
+
+    Referenced by: Board, Boolean, Context, ContextGeometryUtils, ContextTypesUtils, Ellipse, EventsMap, FlexLayout, GridLayout, Group, Image, Interaction, Library, LibraryComponent, LibraryTypography, OpenOverlay, OverlayAction, Page, Path, Penpot, Rectangle, ShapeBase, SvgRaw, Text, ToggleOverlay, Viewport
   members: {}
 StrokeCap:
   overview: |-
@@ -15399,6 +15545,8 @@ StrokeCap:
 
     Represents the cap style of a stroke in Penpot.
     This type defines various styles for the ends of a stroke.
+
+    Referenced by: Stroke
   members: {}
 Theme:
   overview: |-
@@ -15410,6 +15558,8 @@ Theme:
     ```
 
     This type specifies the possible themes: 'light' or 'dark'.
+
+    Referenced by: Context, EventsMap, Penpot
   members: {}
 TrackType:
   overview: |-
@@ -15426,6 +15576,8 @@ TrackType:
 
     Represents the type of track in Penpot.
     This type defines various track types that can be used in layout configurations.
+
+    Referenced by: GridLayout, Track
   members: {}
 Trigger:
   overview: |-
@@ -15446,4 +15598,6 @@ Trigger:
     * `mouse-enter` triggers when the user moves the mouse inside the shape (even if no mouse button is pressed)
     * `mouse-leave` triggers when the user moves the mouse outside the shape.
     * `after-delay` triggers after the `delay` time has passed even if no interaction from the user happens.
+
+    Referenced by: Board, Boolean, Ellipse, Group, Image, Interaction, Path, Rectangle, ShapeBase, SvgRaw, Text
   members: {}
