@@ -15,8 +15,8 @@ initial_instructions: |
   At the top level, a design project contains one or more `Page` objects.
   Each `Page` contains a tree of elements. For a given instance `page`, its root shape is `page.root`.
   A Page is frequently structured into boards. A `Board` is a high-level grouping element.
-  A `Group` is a more low-level grouping element to organize low-level shapes into a logical unit.
-  Low-level shape types are `Rectangle`, `Path`, `Text`, `Ellipse`, `Image`, etc.
+  A `Group` is a more low-level grouping element used to organize low-level shapes into a logical unit.
+  Actual low-level shape types are `Rectangle`, `Path`, `Text`, `Ellipse`, `Image`, `Boolean`, and `SvgRaw`. 
   
   One of your key tools is the `execute_code` tool, which allows you to run JavaScript code using the Penpot Plugin API
   directly in the connected project.
@@ -50,6 +50,8 @@ initial_instructions: |
       Generates an overview structure of the given shape,
       providing the shape's id, name and type, and recursively the children's structure.
     * findShapeById(id: string): Shape | null
-    * findShape(predicate: (shape: Shape) => boolean, root: Shape | null = penpot.root): Shape | null
+    * findShape(predicate: (shape: Shape) => boolean, root: Shape | null = null): Shape | null
+      If no root is provided, search globally (in all pages).
+    * findShapes(predicate: (shape: Shape) => boolean, root: Shape | null = null): Shape[]
   
   You have hereby read the 'Penpot High-Level Overview' and need not use a tool to read it again.
