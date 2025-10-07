@@ -5,6 +5,11 @@ using the Model Context Protocol (MCP), building on Penpot's Plugin API
 to facilitate design data retrieval, modification, and creation.
 
 
+## Demonstration
+
+[![Video](https://v32155.1blu.de/penpot/PenpotFest2025_thumbnail.png)](https://v32155.1blu.de/penpot/PenpotFest2025.mp4)
+
+
 ## Architecture
 
 The Penpot MCP server exposes tools to AI clients (LLMs), which support the retrieval
