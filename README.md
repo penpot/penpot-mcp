@@ -42,7 +42,16 @@ Penpot Plugin API both natural and type-safe.
 
 To use the Penpot MCP server, you must
  * run the MCP server and connect your AI client to it,
- * run the Penpot MCP plugin in Penpot and connect it to the MCP server.
+ * run the web server providing the Penpot MCP plugin, and
+ * open the Penpot MCP plugin in Penpot and connect it to the MCP server. 
+
+Follow the steps below to enable the integration.
+
+### Prerequisites
+
+The project requires [Node.js](https://nodejs.org/) (tested with v22).
+Following the installation of Node.js, the tools `npm` and `npx` should be 
+available in your terminal.
 
 ### Build & Launch the MCP Server and the Plugin Server
 
@@ -51,7 +60,7 @@ If it's your first execution, install the required dependencies:
 npm install
 ```
 
-Then build all components and start them:
+Then build all components and start the two servers:
 ```shell
 npm run bootstrap
 ```

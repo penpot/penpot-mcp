@@ -3,11 +3,6 @@
 A Model Context Protocol (MCP) server that provides Penpot integration 
 capabilities for AI clients supporting the model context protocol (MCP).
 
-## Prerequisites
-
-- Node.js (tested with v22)
-- npm (with npx on the PATH)
-
 ## Setup
 
 1. Install Dependencies
