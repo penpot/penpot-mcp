@@ -1,7 +1,7 @@
 # The Penpot MCP Server
 
 This project enables LLMs to interact directly with Penpot design projects 
-using the Model Context Protocol (MCP), building on Penpot's Plugin API
+using the model context protocol (MCP), building on Penpot's plugin API
 to facilitate design data retrieval, modification, and creation.
 
 
@@ -58,7 +58,7 @@ The project requires [Node.js](https://nodejs.org/) (tested with v22).
 Following the installation of Node.js, the tools `npm` and `npx` should be 
 available in your terminal.
 
-### Build & Launch the MCP Server and the Plugin Server
+### 1. Build & Launch the MCP Server and the Plugin Server
 
 If it's your first execution, install the required dependencies:
 ```shell
@@ -76,7 +76,7 @@ This bootstrap command will:
   * start all components (`npm run start:all`)
 
 
-### Load the Plugin in Penpot and Establish the Connection
+### 2. Load the Plugin in Penpot and Establish the Connection
 
 1. Open Penpot in your browser
 2. Navigate to a design file
@@ -88,7 +88,9 @@ This bootstrap command will:
    (Check the browser's developer console for WebSocket connection logs.
    Check the MCP server terminal for WebSocket connection messages.)
 
-### Connecting an MCP Client
+> :warning: Do not close the plugin's UI while using the MCP server, as this will close the connection.
+
+### 3. Connect an MCP Client
 
 By default, the server runs on port 4401 and provides:
 
@@ -116,13 +118,17 @@ allowing clients that support only stdio to connect to the MCP server indirectly
 
 #### Example: Claude Desktop
 
-For Claude Desktop integration, you will need to use a proxy like `mcp-remote` since it only supports stdio transport.
-Install `mcp-remote` as described above.
+For Windows and macOS, there is the official [Claude Desktop app](https://claude.ai/download), which you can use as an MCP client.
+For Linux, there is an [unofficial community version](https://github.com/aaddrick/claude-desktop-debian).
 
-To add the server to Claude Desktop's configuration, locate the configuration file:
+Since Claude Desktop natively supports only stdio transport, you will need to use a proxy like `mcp-remote`.
+Install it as described above.
+
+To add the server to Claude Desktop's configuration, locate the configuration file (or find it via Menu / File / Settings / Developer):
 
 - **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
 Add a `penpot` entry under `mcpServers` with the following content: 
 
@@ -138,7 +144,15 @@ Add a `penpot` entry under `mcpServers` with the following content:
 ```
 
 After updating the configuration file, restart Claude Desktop completely for the changes to take effect.
-Be sure to fully quit the app! On Windows, right-click the tray icon and select "Quit".
+
+> :warning: Be sure to fully quit the app for the changes to take effect; closing the window is *not* sufficient.   
+> To fully terminate the app, choose Menu / File / Quit.
 
 After the restart, you should see the MCP server listed when clicking on the "Search and tools" icon at the bottom
 of the prompt input area.
+
+#### Example: Claude Code
+
+To add the Penpot MCP server to a Claude Code project, issue the command
+
+    claude mcp add penpot -t http http://localhost:4401/mcp
