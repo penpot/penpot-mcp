@@ -6,7 +6,7 @@ import { Task, TaskHandler } from "./TaskHandler";
  */
 const taskHandlers: TaskHandler[] = [new ExecuteCodeTaskHandler()];
 
-penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}`, { width: 400, height: 300 });
+penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}`, { width: 158, height: 200 });
 
 // Handle both legacy string messages and new request-based messages
 penpot.ui.onMessage<string | { id: string; task: string; params: any }>((message) => {
