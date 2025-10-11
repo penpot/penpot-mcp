@@ -12,11 +12,11 @@
 - **Declaration Files**: Generated with source maps
 
 ## Naming Conventions
-- **Classes**: PascalCase (e.g., `HelloWorldTool`, `PenpotMcpServer`)
+- **Classes**: PascalCase (e.g., `ExeceuteCodeTool`, `PenpotMcpServer`)
 - **Interfaces**: PascalCase (e.g., `Tool`)
 - **Methods**: camelCase (e.g., `execute`, `registerTools`)
 - **Constants**: camelCase for readonly properties (e.g., `definition`)
-- **Files**: PascalCase for classes (e.g., `HelloWorldTool.ts`)
+- **Files**: PascalCase for classes (e.g., `ExecuteCodeTool.ts`)
 
 ## Documentation Style
 - **JSDoc**: Use comprehensive JSDoc comments for classes, methods, and interfaces

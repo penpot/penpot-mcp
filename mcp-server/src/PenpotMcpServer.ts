@@ -1,8 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-
-import { HelloWorldTool } from "./tools/HelloWorldTool";
 import { PrintTextTool } from "./tools/PrintTextTool";
 import { ExecuteCodeTool } from "./tools/ExecuteCodeTool";
 import { PluginBridge } from "./PluginBridge";
@@ -63,7 +61,6 @@ export class PenpotMcpServer {
 
     private registerTools(): void {
         const toolInstances: Tool<any>[] = [
-            new HelloWorldTool(this),
             new PrintTextTool(this),
             new ExecuteCodeTool(this),
             new HighLevelOverviewTool(this),
