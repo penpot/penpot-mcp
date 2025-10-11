@@ -10,9 +10,7 @@
         "build:types": "tsc --emitDeclarationOnly --outDir dist",
         "build:full": "npm run build && npm run build:types",
         "start": "node dist/index.js",
-        "dev": "node --loader ts-node/esm src/index.ts",
-        "format": "prettier --write .",
-        "format:check": "prettier --check ."
+        "dev": "node --loader ts-node/esm src/index.ts"
     },
     "keywords": [
         "mcp",
@@ -40,7 +38,6 @@
         "@types/node": "^20.0.0",
         "@types/ws": "^8.5.10",
         "esbuild": "^0.19.0",
-        "prettier": "^3.0.0",
         "ts-node": "^10.9.0",
         "typescript": "^5.0.0"
     },

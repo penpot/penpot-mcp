@@ -6,7 +6,8 @@
     "install:all": "concurrently --names \"COMMON,MCP-SERVER,PLUGIN\" --prefix-colors \"green,cyan,magenta\" \"npm --prefix common install\" \"npm --prefix mcp-server install\" \"npm --prefix penpot-plugin install\"",
     "build:all": "concurrently --names \"COMMON,MCP-SERVER,PLUGIN\" --prefix-colors \"green,cyan,magenta\" --success first \"npm --prefix common install && npm --prefix common run build\" \"npm --prefix mcp-server run build\" \"npm --prefix penpot-plugin run build\"",
     "start:all": "concurrently --names \"MCP-SERVER,PLUGIN-SERVER\" --prefix-colors \"cyan,magenta\" --kill-others-on-fail \"npm --prefix mcp-server start\" \"npm --prefix penpot-plugin run dev\"",
-    "bootstrap": "npm run install:all && npm run build:all && npm run start:all"
+    "bootstrap": "npm run install:all && npm run build:all && npm run start:all",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,8 @@
   "dependencies": {
     "concurrently": "^8.2.2",
     "kill-port": "^2.0.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
   }
 }
