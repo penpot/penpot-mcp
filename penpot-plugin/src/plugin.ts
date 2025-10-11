@@ -1,11 +1,10 @@
-import { PrintTextTaskHandler } from "./task-handlers/PrintTextTaskHandler";
 import { ExecuteCodeTaskHandler } from "./task-handlers/ExecuteCodeTaskHandler";
 import { Task, TaskHandler } from "./TaskHandler";
 
 /**
  * Registry of all available task handlers.
  */
-const taskHandlers: TaskHandler[] = [new PrintTextTaskHandler(), new ExecuteCodeTaskHandler()];
+const taskHandlers: TaskHandler[] = [new ExecuteCodeTaskHandler()];
 
 penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}`, { width: 400, height: 300 });
 

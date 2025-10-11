@@ -60,16 +60,6 @@ export interface PluginTaskResponse<T> {
 }
 
 /**
- * Parameters for the printText task.
- */
-export interface PrintTextTaskParams {
-    /**
-     * The text to be displayed in Penpot.
-     */
-    text: string;
-}
-
-/**
  * Parameters for the executeCode task.
  */
 export interface ExecuteCodeTaskParams {
