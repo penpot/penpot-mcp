@@ -171,7 +171,7 @@
         </style>
     </head>
     <body>
-        <h1>Penpot MCP REPL</h1>
+        <h1>Penpot API REPL</h1>
 
         <div class="repl-container" id="repl-container">
             <!-- REPL entries will be dynamically added here -->
@@ -183,25 +183,26 @@
             $(document).ready(function () {
                 let isExecuting = false;
                 let entryCounter = 1;
+                let lastCode = ""; // store the last executed code
 
                 // create the initial input entry
                 createNewEntry();
 
                 function createNewEntry() {
                     const entryId = `entry-${entryCounter}`;
+                    const defaultCode = lastCode || "";
                     const entryHtml = `
-                    <div class="repl-entry" id="${entryId}">
-                        <div class="entry-number">In [${entryCounter}]:</div>
-                        <div class="input-section">
-                            <textarea class="code-input" id="code-input-${entryCounter}" 
-                                     placeholder="Enter your JavaScript code here...
-// Example:
+                        <div class="repl-entry" id="${entryId}">
+                            <div class="entry-number">In [${entryCounter}]:</div>
+                            <div class="input-section">
+                                <textarea class="code-input" id="code-input-${entryCounter}"
+                                         placeholder="// Enter your JavaScript code here...
 console.log('Hello from Penpot!');
-return 'This will be the result';"></textarea>
-                            <button class="execute-btn" id="execute-btn-${entryCounter}">Execute Code</button>
+return 'This will be the result';">${escapeHtml(defaultCode)}</textarea>
+                                <button class="execute-btn" id="execute-btn-${entryCounter}">Execute Code</button>
+                            </div>
                         </div>
-                    </div>
-                `;
+                        `;
 
                     $("#repl-container").append(entryHtml);
 
@@ -326,6 +327,9 @@ return 'This will be the result';"></textarea>
                             // make the textarea read-only and remove the execute button
                             $codeInput.prop("readonly", true);
                             $(`#execute-btn-${entryNum}`).remove();
+
+                            // store the code for the next entry
+                            lastCode = code;
 
                             // create a new entry for the next input
                             createNewEntry();
