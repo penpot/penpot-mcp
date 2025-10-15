@@ -121,4 +121,22 @@ export class PenpotUtils {
     public static getPageByName(name: string): Page | null {
         return this.findPage((page) => page.name.toLowerCase() === name.toLowerCase());
     }
+
+    public static getPageForShape(shape: Shape): Page | null {
+        for (const page of penpot.currentFile!.pages) {
+            if (page.getShapeById(shape.id)) {
+                return page;
+            }
+        }
+        return null;
+    }
+
+    public static generateCss(shape: Shape): string {
+        const page = this.getPageForShape(shape);
+        if (!page) {
+            throw new Error("Shape is not part of any page");
+        }
+        penpot.openPage(page);
+        return penpot.generateStyle([shape], { type: "css", includeChildren: true });
+    }
 }
