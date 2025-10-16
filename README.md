@@ -88,7 +88,8 @@ This bootstrap command will:
    (Check the browser's developer console for WebSocket connection logs.
    Check the MCP server terminal for WebSocket connection messages.)
 
-> :warning: Do not close the plugin's UI while using the MCP server, as this will close the connection.
+> [!IMPORTANT]
+> Do not close the plugin's UI while using the MCP server, as this will close the connection.
 
 ### 3. Connect an MCP Client
 
@@ -145,7 +146,8 @@ Add a `penpot` entry under `mcpServers` with the following content:
 
 After updating the configuration file, restart Claude Desktop completely for the changes to take effect.
 
-> :warning: Be sure to fully quit the app for the changes to take effect; closing the window is *not* sufficient.   
+> [!IMPORTANT] 
+> Be sure to fully quit the app for the changes to take effect; closing the window is *not* sufficient.   
 > To fully terminate the app, choose Menu / File / Quit.
 
 After the restart, you should see the MCP server listed when clicking on the "Search and tools" icon at the bottom
