@@ -102,10 +102,16 @@ export class PluginBridge {
     public async executePluginTask<TResult extends PluginTaskResult<any>>(
         task: PluginTask<any, TResult>
     ): Promise<TResult> {
-        // Check if there are connected clients
+        // Check for a single connected client
         if (this.connectedClients.size === 0) {
             throw new Error(
                 `No Penpot plugin instances are currently connected. Please ensure the plugin is running and connected.`
+            );
+        }
+        if (this.connectedClients.size > 1) {
+            throw new Error(
+                `Multiple (${this.connectedClients.size}) Penpot MCP Plugin instances are connected. ` +
+                    `Ask the user to ensure that only one instance is connected at a time.`
             );
         }
 
@@ -147,7 +153,7 @@ export class PluginBridge {
         }, this.taskTimeoutSecs * 1000);
 
         this.taskTimeouts.set(task.id, timeoutHandle);
-        this.logger.info(`Sent task ${task.id} to ${sentCount} connected clients`);
+        this.logger.info(`Sent task ${task.id} to ${sentCount} connected client`);
 
         return await task.getResultPromise();
     }
