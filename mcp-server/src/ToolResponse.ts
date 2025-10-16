@@ -4,10 +4,22 @@ type CallToolContent = CallToolResult["content"][number];
 type TextItem = Extract<CallToolContent, { type: "text" }>;
 type ImageItem = Extract<CallToolContent, { type: "image" }>;
 
-class TextContent implements TextItem {
+export class TextContent implements TextItem {
     [x: string]: unknown;
     readonly type = "text" as const;
     constructor(public text: string) {}
+
+    /**
+     * @param data - Text data as string or as object (from JSON representation where indices are mapped to character codes)
+     */
+    public static textData(data: string | object): string {
+        if (typeof data === "object") {
+            // convert object containing character codes (as obtained from JSON conversion of string) back to string
+            return String.fromCharCode(...(Object.values(data) as number[]));
+        } else {
+            return data;
+        }
+    }
 }
 
 class ImageContent implements ImageItem {
@@ -57,6 +69,16 @@ export class ToolResponse implements CallToolResult {
 export class TextResponse extends ToolResponse {
     constructor(text: string) {
         super([new TextContent(text)]);
+    }
+
+    /**
+     * Creates a TextResponse from text data given as string or as object (from JSON representation where indices are mapped to
+     * character codes).
+     *
+     * @param data - Text data as string or as object (from JSON representation where indices are mapped to character codes)
+     */
+    public static fromData(data: string | object): TextResponse {
+        return new TextResponse(TextContent.textData(data));
     }
 }
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Tool } from "../Tool";
-import { PNGImageContent, PNGResponse, TextResponse, ToolResponse } from "../ToolResponse";
+import { PNGImageContent, PNGResponse, TextContent, TextResponse, ToolResponse } from "../ToolResponse";
 import "reflect-metadata";
 import { PenpotMcpServer } from "../PenpotMcpServer";
 import { ExecuteCodePluginTask } from "../tasks/ExecuteCodePluginTask";
@@ -86,14 +86,14 @@ export class ExportShapeTool extends Tool<ExportShapeArgs> {
             if (args.format === "png") {
                 return new PNGResponse(imageData);
             } else {
-                return new TextResponse(imageData);
+                return TextResponse.fromData(imageData);
             }
         } else {
             // save image to file
             if (args.format === "png") {
                 FileUtils.writeBinaryFile(args.filePath, PNGImageContent.byteData(imageData));
             } else {
-                FileUtils.writeTextFile(args.filePath, imageData);
+                FileUtils.writeTextFile(args.filePath, TextContent.textData(imageData));
             }
             return new TextResponse(`The shape has been exported to ${args.filePath}`);
         }

@@ -1,3 +1,6 @@
+import * as path from "path";
+import * as fs from "fs";
+
 export class FileUtils {
     /**
      * Checks whether the given file path is absolute and raises an error if not.
@@ -5,16 +8,15 @@ export class FileUtils {
      * @param filePath - The file path to check
      */
     public static checkPathIsAbsolute(filePath: string): void {
-        if (!require("path").isAbsolute(filePath)) {
+        if (!path.isAbsolute(filePath)) {
             throw new Error(`The specified file path must be absolute: ${filePath}`);
         }
     }
 
     public static createParentDirectories(filePath: string): void {
-        const path = require("path");
         const dir = path.dirname(filePath);
-        if (!require("fs").existsSync(dir)) {
-            require("fs").mkdirSync(dir, { recursive: true });
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
         }
     }
 
@@ -26,7 +28,7 @@ export class FileUtils {
      */
     public static writeBinaryFile(filePath: string, bytes: Uint8Array): void {
         this.createParentDirectories(filePath);
-        require("fs").writeFileSync(filePath, Buffer.from(bytes));
+        fs.writeFileSync(filePath, Buffer.from(bytes));
     }
 
     /**
@@ -37,6 +39,6 @@ export class FileUtils {
      */
     public static writeTextFile(filePath: string, text: string): void {
         this.createParentDirectories(filePath);
-        require("fs").writeFileSync(filePath, text, { encoding: "utf-8" });
+        fs.writeFileSync(filePath, text, { encoding: "utf-8" });
     }
 }
