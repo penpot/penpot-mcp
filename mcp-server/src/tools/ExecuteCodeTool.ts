@@ -65,7 +65,7 @@ export class ExecuteCodeTool extends Tool<ExecuteCodeArgs> {
         const result = await this.mcpServer.pluginBridge.executePluginTask(task);
 
         if (result.data !== undefined) {
-            return new TextResponse(`Code executed successfully. Result: ${JSON.stringify(result.data, null, 2)}`);
+            return new TextResponse(JSON.stringify(result.data, null, 2));
         } else {
             return new TextResponse("Code executed successfully with no return value.");
         }
