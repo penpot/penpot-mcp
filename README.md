@@ -78,6 +78,18 @@ This bootstrap command will:
 
 ### 2. Load the Plugin in Penpot and Establish the Connection
 
+> [!IMPORTANT]
+> **Browser Compatibility**  
+> Starting with Chromium version 142, Google has hardened the private network access (PNA) enforcement layer.
+> This means that newer Chromium-based browsers (Chrome, Edge, Vivaldi, Opera, Brave, etc.) will not allow
+> Penpot to connect to a local plugin server by default.
+> 
+> To work around this, you can either
+>   * use Firefox or
+>   * use an older version of a Chromium-based browser (up to Chromium version 141).
+> 
+> We are working on a solution to this issue.
+
 1. Open Penpot in your browser
 2. Navigate to a design file
 3. Open the Plugins menu
