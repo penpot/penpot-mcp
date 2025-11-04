@@ -42,7 +42,7 @@ initial_instructions: |
     * The `Shape` type is a union type. `ShapeBase` is a base type most shapes build upon.
       Any given shape contains information on the concrete type via its `type` field.
 
-  Another useful object is the `penpotUtils` object (which is not part of the official API). It provides:
+  CRITICAL: The `penpotUtils` object provides essential utilities - USE THESE INSTEAD OF WRITING YOUR OWN:
     * getPages(): { id: string; name: string }[]
     * getPageById(id: string): Page | null
     * getPageByName(name: string): Page | null
@@ -53,5 +53,30 @@ initial_instructions: |
     * findShape(predicate: (shape: Shape) => boolean, root: Shape | null = null): Shape | null
       If no root is provided, search globally (in all pages).
     * findShapes(predicate: (shape: Shape) => boolean, root: Shape | null = null): Shape[]
+
+  General pointers for working with Penpot designs:
+    * Prefer `penpotUtils` helper functions — avoid reimplementing shape searching.
+    * To get an overview of a single page, use `penpotUtils.shapeStructure(page.root, 3)`. Note that `penpot.root` refers to the current page only. When working across pages, first determine the relevant page(s).
+    * Use `penpotUtils.findShapes()` or `penpotUtils.findShape()` with predicates to locate elements efficiently.
+
+  Common tasks - Quick Reference (ALWAYS use penpotUtils for these):
+
+    Find all images (including shapes with image fills):
+      const images = penpotUtils.findShapes(
+        shape => shape.type === 'image' || shape.fills?.some(fill => fill.fillImage),
+        penpot.root
+      );
+
+    Find text elements:
+      const texts = penpotUtils.findShapes(shape => shape.type === 'text', penpot.root);
+
+    Find shapes by name:
+      const shape = penpotUtils.findShape(shape => shape.name === 'MyShape');
+
+    Get structure of current selection:
+      const structure = penpotUtils.shapeStructure(penpot.selection[0]);
+
+    Find shapes in current selection/board:
+      const shapes = penpotUtils.findShapes(predicate, penpot.selection[0] || penpot.root);
 
   You have hereby read the 'Penpot High-Level Overview' and need not use a tool to read it again.
