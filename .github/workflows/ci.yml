@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Install common dependencies
+        working-directory: ./common
+        run: npm ci
+
+      - name: Type check common
+        working-directory: ./common
+        run: npx tsc --noEmit
+
+      - name: Build common
+        working-directory: ./common
+        run: npm run build
+
+      - name: Install mcp-server dependencies
+        working-directory: ./mcp-server
+        run: npm ci
+
+      - name: Type check mcp-server
+        working-directory: ./mcp-server
+        run: npx tsc --noEmit
+
+      - name: Build mcp-server
+        working-directory: ./mcp-server
+        run: npm run build
+
+      - name: Install penpot-plugin dependencies
+        working-directory: ./penpot-plugin
+        run: npm ci
+
+      - name: Type check penpot-plugin
+        working-directory: ./penpot-plugin
+        run: npx tsc --noEmit
+
+      - name: Build penpot-plugin
+        working-directory: ./penpot-plugin
+        run: npm run build
