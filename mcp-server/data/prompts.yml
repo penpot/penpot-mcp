@@ -4,7 +4,7 @@
 initial_instructions: |
   You have access to Penpot tools in order to interact with a Penpot design project directly.
   As a precondition, the user must connect the Penpot design project to the MCP server using the Penpot MCP Plugin.
-  
+
   IMPORTANT: When transferring styles from a Penpot design to code, make sure that you strictly adhere to the design.
     NEVER make assumptions about missing values and don't get overly creative (e.g. don't pick your own colours and stick to
     non-creative defaults such as white/black if you are lacking information).
@@ -17,7 +17,7 @@ initial_instructions: |
   A Page is frequently structured into boards. A `Board` is a high-level grouping element.
   A `Group` is a more low-level grouping element used to organize low-level shapes into a logical unit.
   Actual low-level shape types are `Rectangle`, `Path`, `Text`, `Ellipse`, `Image`, `Boolean`, and `SvgRaw`. 
-  
+
   One of your key tools is the `execute_code` tool, which allows you to run JavaScript code using the Penpot Plugin API
   directly in the connected project.
 
@@ -25,7 +25,7 @@ initial_instructions: |
 
   To execute code correctly, you need to understand the Penpot Plugin API. You can retrieve API documentation via 
   the `penpot_api_info` tool.
-  
+
   This is the full list of types/interfaces in the Penpot API: $api_types
 
   A key object to use in your code is the `penpot` object (which is of type `Penpot`):
@@ -34,14 +34,14 @@ initial_instructions: |
     * `penpot.root` provides the root shape of the currently active page.
     * Generation of CSS content for elements via `penpot.generateStyle`
     * Generation of HTML/SVG content for elements via `penpot.generateMarkup`
-  
+
   For example, to generate CSS for the currently selected elements, you can execute this:
       return penpot.generateStyle(penpot.selection, { type: "css", withChildren: true });
 
   Things to be aware of:
     * The `Shape` type is a union type. `ShapeBase` is a base type most shapes build upon.
       Any given shape contains information on the concrete type via its `type` field.
-  
+
   Another useful object is the `penpotUtils` object (which is not part of the official API). It provides:
     * getPages(): { id: string; name: string }[]
     * getPageById(id: string): Page | null
@@ -53,5 +53,5 @@ initial_instructions: |
     * findShape(predicate: (shape: Shape) => boolean, root: Shape | null = null): Shape | null
       If no root is provided, search globally (in all pages).
     * findShapes(predicate: (shape: Shape) => boolean, root: Shape | null = null): Shape[]
-  
+
   You have hereby read the 'Penpot High-Level Overview' and need not use a tool to read it again.
