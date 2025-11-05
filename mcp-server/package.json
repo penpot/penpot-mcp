@@ -30,7 +30,8 @@
         "pino": "^9.10.0",
         "pino-pretty": "^13.1.1",
         "reflect-metadata": "^0.1.13",
-        "ws": "^8.18.0"
+        "ws": "^8.18.0",
+        "zod": "3.25.76"
     },
     "devDependencies": {
         "@types/express": "^4.17.0",
