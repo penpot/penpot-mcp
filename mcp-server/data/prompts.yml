@@ -17,6 +17,16 @@ initial_instructions: |
   A Page is frequently structured into boards. A `Board` is a high-level grouping element.
   A `Group` is a more low-level grouping element used to organize low-level shapes into a logical unit.
   Actual low-level shape types are `Rectangle`, `Path`, `Text`, `Ellipse`, `Image`, `Boolean`, and `SvgRaw`. 
+  Concrete things to know about shapes:
+    * The `Shape` type is a union type. `ShapeBase` is a base type most shapes build upon.
+      Any given shape contains information on the concrete type via its `type` field.
+    * The `Image` type is a legacy type. Images are now typically mostly embedded in a `Fill` with `fillImage` set to an 
+      `ImageData` object, i.e. the `fills` property of of a shape (e.g. a `Rectangle`) will contain a fill where
+      `fillImage` is set.
+    * The location properties `x` and `y` refer to the top left corner of a shape's bounding box.
+    * The z-order of shapes is, by default, determined by the order in the `children` array of the parent shape.
+      Therefore, when creating shapes that should be on top of each other, add them to the parent in the correct order
+      (i.e. add background shapes first, then foreground shapes later).
 
   One of your key tools is the `execute_code` tool, which allows you to run JavaScript code using the Penpot Plugin API
   directly in the connected project.
@@ -38,10 +48,6 @@ initial_instructions: |
   For example, to generate CSS for the currently selected elements, you can execute this:
       return penpot.generateStyle(penpot.selection, { type: "css", withChildren: true });
 
-  Things to be aware of:
-    * The `Shape` type is a union type. `ShapeBase` is a base type most shapes build upon.
-      Any given shape contains information on the concrete type via its `type` field.
-
   CRITICAL: The `penpotUtils` object provides essential utilities - USE THESE INSTEAD OF WRITING YOUR OWN:
     * getPages(): { id: string; name: string }[]
     * getPageById(id: string): Page | null
@@ -56,27 +62,23 @@ initial_instructions: |
 
   General pointers for working with Penpot designs:
     * Prefer `penpotUtils` helper functions — avoid reimplementing shape searching.
-    * To get an overview of a single page, use `penpotUtils.shapeStructure(page.root, 3)`. Note that `penpot.root` refers to the current page only. When working across pages, first determine the relevant page(s).
+    * To get an overview of a single page, use `penpotUtils.shapeStructure(page.root, 3)`. 
+      Note that `penpot.root` refers to the current page only. When working across pages, first determine the relevant page(s).
     * Use `penpotUtils.findShapes()` or `penpotUtils.findShape()` with predicates to locate elements efficiently.
 
   Common tasks - Quick Reference (ALWAYS use penpotUtils for these):
-
-    Find all images (including shapes with image fills):
-      const images = penpotUtils.findShapes(
-        shape => shape.type === 'image' || shape.fills?.some(fill => fill.fillImage),
-        penpot.root
-      );
-
-    Find text elements:
-      const texts = penpotUtils.findShapes(shape => shape.type === 'text', penpot.root);
-
-    Find shapes by name:
-      const shape = penpotUtils.findShape(shape => shape.name === 'MyShape');
-
-    Get structure of current selection:
-      const structure = penpotUtils.shapeStructure(penpot.selection[0]);
-
-    Find shapes in current selection/board:
-      const shapes = penpotUtils.findShapes(predicate, penpot.selection[0] || penpot.root);
+    * Find all images:
+        const images = penpotUtils.findShapes(
+          shape => shape.type === 'image' || shape.fills?.some(fill => fill.fillImage),
+          penpot.root
+        );
+    * Find text elements:
+        const texts = penpotUtils.findShapes(shape => shape.type === 'text', penpot.root);
+    * Find (the first) shape with a given name:
+        const shape = penpotUtils.findShape(shape => shape.name === 'MyShape');
+    * Get structure of current selection:
+        const structure = penpotUtils.shapeStructure(penpot.selection[0]);
+    * Find shapes in current selection/board:
+        const shapes = penpotUtils.findShapes(predicate, penpot.selection[0] || penpot.root);
 
   You have hereby read the 'Penpot High-Level Overview' and need not use a tool to read it again.
