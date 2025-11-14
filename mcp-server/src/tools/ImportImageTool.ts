@@ -44,7 +44,7 @@ export class ImportImageArgs {
 }
 
 /**
- * Tool for importing an image from the local file system into Penpot
+ * Tool for importing a raster image from the local file system into Penpot
  */
 export class ImportImageTool extends Tool<ImportImageArgs> {
     /**
@@ -56,7 +56,6 @@ export class ImportImageTool extends Tool<ImportImageArgs> {
         ".png": "image/png",
         ".gif": "image/gif",
         ".webp": "image/webp",
-        ".bmp": "image/bmp",
     };
 
     /**
@@ -78,7 +77,7 @@ export class ImportImageTool extends Tool<ImportImageArgs> {
             "that uses the image as a fill. The rectangle has the image's original proportions by default. " +
             "Optionally accepts position (x, y) and dimensions (width, height) parameters. " +
             "If only one dimension is provided, the other is calculated to maintain the image's aspect ratio. " +
-            "Supported image formats: JPG, PNG, GIF, WEBP, and BMP."
+            "Supported formats: JPEG, PNG, GIF, WEBP."
         );
     }
 
@@ -107,76 +106,18 @@ export class ImportImageTool extends Tool<ImportImageArgs> {
 
         // generate and execute JavaScript code to import the image
         const fileName = path.basename(args.filePath);
-        const code = this.generateImportCode(fileName, base64Data, mimeType, args);
-        const task = new ExecuteCodePluginTask({ code: code });
-        await this.mcpServer.pluginBridge.executePluginTask(task);
-
-        return new TextResponse(`Image imported successfully from ${args.filePath}`);
-    }
-
-    /**
-     * Generates the JavaScript code to import the image in the Penpot plugin context.
-     *
-     * @param fileName - The name of the file
-     * @param base64Data - The base64-encoded image data
-     * @param mimeType - The MIME type of the image
-     * @param args - The tool arguments containing position and dimension parameters
-     */
-    protected generateImportCode(
-        fileName: string,
-        base64Data: string,
-        mimeType: string,
-        args: ImportImageArgs
-    ): string {
-        // escape the base64 data for use in a JavaScript string
         const escapedBase64 = base64Data.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
         const escapedFileName = fileName.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+        const code = `
+            const rectangle = await penpotUtils.importImage(
+                '${escapedBase64}', '${mimeType}', '${escapedFileName}', 
+                ${args.x ?? "undefined"}, ${args.y ?? "undefined"}, 
+                ${args.width ?? "undefined"}, ${args.height ?? "undefined"});
+            return { shapeId: rectangle.id };
+            `;
+        const task = new ExecuteCodePluginTask({ code: code });
+        const executionResult = await this.mcpServer.pluginBridge.executePluginTask(task);
 
-        return `
-            // convert base64 to Uint8Array
-            const base64 = '${escapedBase64}';
-            const bytes = penpotUtils.atob(base64);
-        
-            // upload the image data to Penpot
-            const imageData = await penpot.uploadMediaData('${escapedFileName}', bytes, '${mimeType}');
-        
-            // create a rectangle shape
-            const rect = penpot.createRectangle();
-            rect.name = '${escapedFileName}';
-        
-            // calculate dimensions
-            let rectWidth, rectHeight;
-            const hasWidth = ${args.width !== undefined};
-            const hasHeight = ${args.height !== undefined};
-        
-            if (hasWidth && hasHeight) {
-                // both width and height provided - use them directly
-                rectWidth = ${args.width ?? 0};
-                rectHeight = ${args.height ?? 0};
-            } else if (hasWidth) {
-                // only width provided - maintain aspect ratio
-                rectWidth = ${args.width ?? 0};
-                rectHeight = rectWidth * (imageData.height / imageData.width);
-            } else if (hasHeight) {
-                // only height provided - maintain aspect ratio
-                rectHeight = ${args.height ?? 0};
-                rectWidth = rectHeight * (imageData.width / imageData.height);
-            } else {
-                // neither provided - use original dimensions
-                rectWidth = imageData.width;
-                rectHeight = imageData.height;
-            }
-        
-            // set rectangle dimensions
-            rect.resize(rectWidth, rectHeight);
-        
-            // set position if provided
-            ${args.x !== undefined ? `rect.x = ${args.x};` : ""}
-            ${args.y !== undefined ? `rect.y = ${args.y};` : ""}
-        
-            // apply the image as a fill
-            rect.fills = [{ fillOpacity: 1, fillImage: imageData }];
-        
-            return { shapeId: rect.id };`;
+        return new TextResponse(JSON.stringify(executionResult.data?.result, null, 2));
     }
 }
