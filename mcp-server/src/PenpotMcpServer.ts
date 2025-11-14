@@ -9,6 +9,7 @@ import { Tool } from "./Tool";
 import { HighLevelOverviewTool } from "./tools/HighLevelOverviewTool";
 import { PenpotApiInfoTool } from "./tools/PenpotApiInfoTool";
 import { ExportShapeTool } from "./tools/ExportShapeTool";
+import { ImportImageTool } from "./tools/ImportImageTool";
 import { ReplServer } from "./ReplServer";
 import { ApiDocs } from "./ApiDocs";
 
@@ -64,6 +65,7 @@ export class PenpotMcpServer {
             new HighLevelOverviewTool(this),
             new PenpotApiInfoTool(this, this.apiDocs),
             new ExportShapeTool(this),
+            new ImportImageTool(this),
         ];
 
         for (const tool of toolInstances) {

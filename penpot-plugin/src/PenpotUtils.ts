@@ -1,4 +1,4 @@
-import { Page, Shape } from "@penpot/plugin-types";
+import { Page, Rectangle, Shape } from "@penpot/plugin-types";
 
 export class PenpotUtils {
     /**
@@ -138,5 +138,118 @@ export class PenpotUtils {
         }
         penpot.openPage(page);
         return penpot.generateStyle([shape], { type: "css", includeChildren: true });
+    }
+
+    /**
+     * Decodes a base64 string to a Uint8Array.
+     * This is required because the Penpot plugin environment does not provide the atob function.
+     *
+     * @param base64 - The base64-encoded string to decode
+     * @returns The decoded data as a Uint8Array
+     */
+    public static atob(base64: string): Uint8Array {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        const lookup = new Uint8Array(256);
+        for (let i = 0; i < chars.length; i++) {
+            lookup[chars.charCodeAt(i)] = i;
+        }
+
+        let bufferLength = base64.length * 0.75;
+        if (base64[base64.length - 1] === "=") {
+            bufferLength--;
+            if (base64[base64.length - 2] === "=") {
+                bufferLength--;
+            }
+        }
+
+        const bytes = new Uint8Array(bufferLength);
+        let p = 0;
+        for (let i = 0; i < base64.length; i += 4) {
+            const encoded1 = lookup[base64.charCodeAt(i)];
+            const encoded2 = lookup[base64.charCodeAt(i + 1)];
+            const encoded3 = lookup[base64.charCodeAt(i + 2)];
+            const encoded4 = lookup[base64.charCodeAt(i + 3)];
+
+            bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+            bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+            bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
+        }
+
+        return bytes;
+    }
+
+    /**
+     * Imports an image from base64 data into the Penpot design as a Rectangle shape filled with the image.
+     * The rectangle has the image's original proportions by default.
+     * Optionally accepts position (x, y) and dimensions (width, height) parameters.
+     * If only one dimension is provided, the other is calculated to maintain the image's aspect ratio.
+     *
+     * This function is used internally by the ImportImageTool in the MCP server.
+     *
+     * @param base64 - The base64-encoded image data
+     * @param mimeType - The MIME type of the image (e.g., "image/png")
+     * @param name - The name to assign to the newly created rectangle shape
+     * @param x - The x-coordinate for positioning the rectangle (optional)
+     * @param y - The y-coordinate for positioning the rectangle (optional)
+     * @param width - The desired width of the rectangle (optional)
+     * @param height - The desired height of the rectangle (optional)
+     */
+    public static async importImage(
+        base64: string,
+        mimeType: string,
+        name: string,
+        x: number | undefined,
+        y: number | undefined,
+        width: number | undefined,
+        height: number | undefined
+    ): Promise<Rectangle> {
+        // convert base64 to Uint8Array
+        const bytes = PenpotUtils.atob(base64);
+
+        // upload the image data to Penpot
+        const imageData = await penpot.uploadMediaData(name, bytes, mimeType);
+
+        // create a rectangle shape
+        const rect = penpot.createRectangle();
+        rect.name = "${escapedFileName}";
+
+        // calculate dimensions
+        let rectWidth, rectHeight;
+        const hasWidth = width !== undefined;
+        const hasHeight = height !== undefined;
+
+        if (hasWidth && hasHeight) {
+            // both width and height provided - use them directly
+            rectWidth = width;
+            rectHeight = height;
+        } else if (hasWidth) {
+            // only width provided - maintain aspect ratio
+            rectWidth = width;
+            rectHeight = rectWidth * (imageData.height / imageData.width);
+        } else if (hasHeight) {
+            // only height provided - maintain aspect ratio
+            rectHeight = height;
+            rectWidth = rectHeight * (imageData.width / imageData.height);
+        } else {
+            // neither provided - use original dimensions
+            rectWidth = imageData.width;
+            rectHeight = imageData.height;
+        }
+
+        // set rectangle dimensions
+        rect.resize(rectWidth, rectHeight);
+
+        // set position if provided
+        if (x !== undefined) {
+            rect.x = x;
+        }
+        if (y !== undefined) {
+            rect.y = y;
+        }
+
+        // apply the image as a fill
+        rect.fills = [{ fillOpacity: 1, fillImage: imageData }];
+
+        return rect;
     }
 }
