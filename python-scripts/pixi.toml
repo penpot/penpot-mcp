@@ -1,9 +1,9 @@
-[project]
+[workspace]
 authors = ["Oraios AI <info@oraios-ai.de>"]
 channels = ["conda-forge"]
 description = "Scripts supporting the development of the Penpot MCP server"
 name = "penpot-mcp-scripts"
-platforms = ["win-64"]
+platforms = ["win-64","linux-64"]
 version = "0.1.0"
 
 [tasks]
