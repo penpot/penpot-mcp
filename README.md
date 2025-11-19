@@ -78,17 +78,21 @@ This bootstrap command will:
 
 ### 2. Load the Plugin in Penpot and Establish the Connection
 
-> [!IMPORTANT]
-> **Browser Compatibility**  
-> Starting with Chromium version 142, Google has hardened the private network access (PNA) enforcement layer.
-> This means that newer Chromium-based browsers (Chrome, Edge, Vivaldi, Opera, Brave, etc.) will not allow
-> Penpot to connect to a local plugin server by default.
+> [!NOTE]
+> **Browser Connectivity Restrictions**
+>
+> Starting with Chromium version 142, the private network access (PNA) restrictions have been hardened,
+> and when connecting to `localhost` from a web application served from a different origin
+> (such as https://design.penpot.app), the connection must explicitly be allowed.
 > 
-> To work around this, you can either
->   * use Firefox or
->   * use an older version of a Chromium-based browser (up to Chromium version 141).
+> Most Chromium-based browsers (e.g. Chrome, Vivaldi) will display a popup requesting permission
+> to access the local network. Be sure to approve the request to allow the connection.
 > 
-> We are working on a solution to this issue.
+> Some browsers take additional security measures, and you may need to disable them.
+> For example, in Brave, disable the "Shield" for the Penpot website to allow local network access.
+> 
+> If your browser refuses to connect to the locally served plugin, check its configuration or 
+> try a different browser (e.g. Firefox) that does not enforce these restrictions.
 
 1. Open Penpot in your browser
 2. Navigate to a design file
@@ -111,7 +115,7 @@ By default, the server runs on port 4401 and provides:
 - **Legacy SSE endpoint**: `http://localhost:4401/sse`
 
 These endpoints can be used directly by MCP clients that support them.
-Simply configure the client to the MCP server by providing the respective URL.
+Simply configure the client to connect the MCP server by providing the respective URL.
 
 When using a client that only supports stdio transport,
 a proxy like `mcp-remote` is required.
