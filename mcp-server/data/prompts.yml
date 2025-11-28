@@ -25,7 +25,10 @@ initial_instructions: |
     * The `Image` type is a legacy type. Images are now typically mostly embedded in a `Fill` with `fillImage` set to an 
       `ImageData` object, i.e. the `fills` property of of a shape (e.g. a `Rectangle`) will contain a fill where
       `fillImage` is set.
-    * The location properties `x` and `y` refer to the top left corner of a shape's bounding box.
+    * The location properties `x` and `y` refer to the top left corner of a shape's bounding box in the absolute (Page) coordinate system. 
+    * When a shape is a child of a parent shape, the property `parent` refers to the parent shape, and the read-only properties 
+      `parentX` and `parentY` (as well as `boardX` and `boardY`) provide the position of the shape relative to its parent (containing board).
+      To position a shape within its parent, set the absolute `x` and `y` properties accordingly.
     * The z-order of shapes is, by default, determined by the order in the `children` array of the parent shape.
       Therefore, when creating shapes that should be on top of each other, add them to the parent in the correct order
       (i.e. add background shapes first, then foreground shapes later).
