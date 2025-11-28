@@ -9,6 +9,8 @@ initial_instructions: |
     NEVER make assumptions about missing values and don't get overly creative (e.g. don't pick your own colours and stick to
     non-creative defaults such as white/black if you are lacking information).
 
+  # The Structure of Penpot Designs
+
   A Penpot design ultimately consists of shapes. 
   The type `Shape` is a union type, which encompasses both containers and low-level shapes.
   Shapes in a Penpot design are organized hierarchically.
@@ -28,6 +30,8 @@ initial_instructions: |
       Therefore, when creating shapes that should be on top of each other, add them to the parent in the correct order
       (i.e. add background shapes first, then foreground shapes later).
 
+  # Executing Code
+
   One of your key tools is the `execute_code` tool, which allows you to run JavaScript code using the Penpot Plugin API
   directly in the connected project.
 
@@ -37,6 +41,8 @@ initial_instructions: |
   the `penpot_api_info` tool.
 
   This is the full list of types/interfaces in the Penpot API: $api_types
+
+  # The `penpot` and `penpotUtils` Objects, Exploring Designs
 
   A key object to use in your code is the `penpot` object (which is of type `Penpot`):
     * `penpot.selection` provides the list of shapes the user has selected in the Penpot UI.
@@ -81,4 +87,45 @@ initial_instructions: |
     * Find shapes in current selection/board:
         const shapes = penpotUtils.findShapes(predicate, penpot.selection[0] || penpot.root);
 
+  # Asset Libraries
+    
+  Libraries in Penpot are collections of reusable design assets (components, colors, and typographies) that can be shared across files. 
+  They enable design systems and consistent styling across projects.
+  Each Penpot file has its own local library and can connect to external shared libraries.
+    
+  Accessing libraries: via `penpot.library` (type: `LibraryContext`):
+    * `penpot.library.local` (type: `Library`) - The current file's own library
+    * `penpot.library.connected` (type: `Library[]`) - Array of already-connected external libraries
+    * `penpot.library.availableLibraries()` (returns: `Promise<LibrarySummary[]>`) - Libraries available to connect
+    * `penpot.library.connectLibrary(libraryId: string)` (returns: `Promise<Library>`) - Connect a new library
+    
+  Each `Library` object has:
+    * `id: string`
+    * `name: string`
+    * `components: LibraryComponent[]` - Array of components
+    * `colors: LibraryColor[]` - Array of colors
+    * `typographies: LibraryTypography[]` - Array of typographies
+    
+  Using library components:
+    * find a component in the library by name:
+        const component: LibraryComponent = library.components.find(comp => comp.name.includes('Button'));
+    * create a new instance of the component on the current page: 
+        const instance: Shape = component.instance();
+      This returns a `Shape` (often a `Board` containing child elements).
+      After instantiation, modify the instance's properties as desired.
+    * get the reference to the main component shape:
+        const mainShape: Shape = component.mainInstance();
+    
+  Adding assets to a library:
+    * const newColor: LibraryColor = penpot.library.local.createColor();
+      newColor.name = 'Brand Primary';
+      newColor.color = '#0066FF';
+    * const newTypo: LibraryTypography = penpot.library.local.createTypography();
+      newTypo.name = 'Heading Large';
+      // Set typography properties...
+    * const shapes: Shape[] = [shape1, shape2]; // shapes to include
+      const newComponent: LibraryComponent = penpot.library.local.createComponent(shapes);
+      newComponent.name = 'My Button';
+    
+  --
   You have hereby read the 'Penpot High-Level Overview' and need not use a tool to read it again.
