@@ -31,14 +31,12 @@ export abstract class Tool<TArgs extends object> {
      * Executes the tool with automatic validation and type safety.
      *
      * This method handles the unknown args from the MCP protocol,
-     * validates them, and delegates to the type-safe implementation.
+     * delegating to the type-safe implementation.
      */
     async execute(args: unknown): Promise<ToolResponse> {
         try {
-            this.logger.info("Executing tool: %s", this.getToolName());
-
             let argsInstance: TArgs = args as TArgs;
-            this.logger.debug("Tool args: %o", argsInstance);
+            this.logger.info("Executing tool: %s; arguments: %s", this.getToolName(), this.formatArgs(argsInstance));
 
             // execute the actual tool logic
             let result = await this.executeCore(argsInstance);
@@ -49,6 +47,46 @@ export abstract class Tool<TArgs extends object> {
             this.logger.error(error);
             return new TextResponse(`Tool execution failed: ${String(error)}`);
         }
+    }
+
+    /**
+     * Formats tool arguments for readable logging.
+     *
+     * Multi-line strings are preserved with proper indentation.
+     */
+    protected formatArgs(args: TArgs): string {
+        const formatted: string[] = [];
+
+        for (const [key, value] of Object.entries(args)) {
+            if (typeof value === "string" && value.includes("\n")) {
+                // multi-line string - preserve formatting with indentation
+                const indentedValue = value
+                    .split("\n")
+                    .map((line, index) => (index === 0 ? line : "    " + line))
+                    .join("\n");
+                formatted.push(`  ${key}: ${indentedValue}`);
+            } else if (typeof value === "string") {
+                // single-line string
+                formatted.push(`  ${key}: "${value}"`);
+            } else if (value === null || value === undefined) {
+                formatted.push(`  ${key}: ${value}`);
+            } else {
+                // other types (numbers, booleans, objects, arrays)
+                const stringified = JSON.stringify(value, null, 2);
+                if (stringified.includes("\n")) {
+                    // multi-line JSON - indent it
+                    const indented = stringified
+                        .split("\n")
+                        .map((line, index) => (index === 0 ? line : "    " + line))
+                        .join("\n");
+                    formatted.push(`  ${key}: ${indented}`);
+                } else {
+                    formatted.push(`  ${key}: ${stringified}`);
+                }
+            }
+        }
+
+        return formatted.length > 0 ? "\n" + formatted.join("\n") : "{}";
     }
 
     public getInputSchema() {
