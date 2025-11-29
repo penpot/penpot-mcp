@@ -5,3 +5,7 @@ dist
 *.orig
 temp
 *.tsbuildinfo
+
+# Log files
+logs/
+*.log

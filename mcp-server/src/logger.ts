@@ -1,27 +1,71 @@
 import pino from "pino";
+import { join, resolve } from "path";
 
 /**
- * Logger instance configured for console output with metadata.
+ * Configuration for log file location and level.
+ */
+const LOG_DIR = process.env.LOG_DIR || "logs";
+const LOG_LEVEL = process.env.LOG_LEVEL || "info";
+
+/**
+ * Generates a timestamped log file name.
  *
- * Configured to output to console only with level, full timestamp, origin, and message.
+ * @returns Log file name
+ */
+function generateLogFileName(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    return `penpot-mcp-${year}${month}${day}-${hours}${minutes}${seconds}.log`;
+}
+
+/**
+ * Absolute path to the log file being written.
+ */
+export const logFilePath = resolve(join(LOG_DIR, generateLogFileName()));
+
+/**
+ * Logger instance configured for both console and file output with metadata.
+ *
+ * Both console and file output use pretty formatting for human readability.
+ * Console output includes colors, while file output is plain text.
  */
 export const logger = pino({
-    level: "info",
+    level: LOG_LEVEL,
     timestamp: pino.stdTimeFunctions.isoTime,
-    formatters: {
-        level: (label) => {
-            return { level: label };
-        },
-    },
     transport: {
-        target: "pino-pretty",
-        options: {
-            colorize: true,
-            translateTime: "SYS:yyyy-mm-dd HH:MM:ss.l",
-            ignore: "pid,hostname",
-            messageFormat: "{msg}",
-            levelFirst: true,
-        },
+        targets: [
+            {
+                // console transport with pretty formatting
+                target: "pino-pretty",
+                level: LOG_LEVEL,
+                options: {
+                    colorize: true,
+                    translateTime: "SYS:yyyy-mm-dd HH:MM:ss.l",
+                    ignore: "pid,hostname",
+                    messageFormat: "{msg}",
+                    levelFirst: true,
+                },
+            },
+            {
+                // file transport with pretty formatting (same as console)
+                target: "pino-pretty",
+                level: LOG_LEVEL,
+                options: {
+                    destination: logFilePath,
+                    colorize: false,
+                    translateTime: "SYS:yyyy-mm-dd HH:MM:ss.l",
+                    ignore: "pid,hostname",
+                    messageFormat: "{msg}",
+                    levelFirst: true,
+                    mkdir: true,
+                },
+            },
+        ],
     },
 });
 

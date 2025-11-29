@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { PenpotMcpServer } from "./PenpotMcpServer";
-import { createLogger } from "./logger";
+import { createLogger, logFilePath } from "./logger";
 
 /**
  * Entry point for Penpot MCP Server
@@ -10,18 +10,20 @@ import { createLogger } from "./logger";
  * gracefully and ensuring proper process termination.
  *
  * Usage:
- * - Default port: node dist/index.js (runs on 4401)
- * - Custom port: node dist/index.js --port <port>
  * - Help: node dist/index.js --help
+ * - Default configuration: runs on port 4401, logs to mcp-server/logs at info level
  */
-
 async function main(): Promise<void> {
     const logger = createLogger("main");
-    try {
-        // Parse command line arguments for port configuration
-        const args = process.argv.slice(2);
-        let port = 4401; // Default port
 
+    // log the file path early so it appears before any potential errors
+    logger.info(`Logging to file: ${logFilePath}`);
+
+    try {
+        const args = process.argv.slice(2);
+        let port = 4401; // default port
+
+        // parse command line arguments
         for (let i = 0; i < args.length; i++) {
             if (args[i] === "--port" || args[i] === "-p") {
                 if (i + 1 < args.length) {
@@ -32,10 +34,20 @@ async function main(): Promise<void> {
                         logger.info("Invalid port number. Using default port 4401.");
                     }
                 }
+            } else if (args[i] === "--log-level" || args[i] === "-l") {
+                if (i + 1 < args.length) {
+                    process.env.LOG_LEVEL = args[i + 1];
+                }
+            } else if (args[i] === "--log-dir") {
+                if (i + 1 < args.length) {
+                    process.env.LOG_DIR = args[i + 1];
+                }
             } else if (args[i] === "--help" || args[i] === "-h") {
                 logger.info("Usage: node dist/index.js [options]");
                 logger.info("Options:");
                 logger.info("  --port, -p <number>    Port number for the HTTP/SSE server (default: 4401)");
+                logger.info("  --log-level, -l <level> Log level: trace, debug, info, warn, error (default: info)");
+                logger.info("  --log-dir <path>       Directory for log files (default: mcp-server/logs)");
                 logger.info("  --help, -h             Show this help message");
                 process.exit(0);
             }
@@ -44,7 +56,7 @@ async function main(): Promise<void> {
         const server = new PenpotMcpServer(port);
         await server.start();
 
-        // Keep the process alive
+        // keep the process alive
         process.on("SIGINT", async () => {
             logger.info("Received SIGINT, shutting down gracefully...");
             await server.stop();
