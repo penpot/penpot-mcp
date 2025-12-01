@@ -122,7 +122,7 @@ class YamlConverter:
 class PenpotAPIDocsProcessor:
     def __init__(self):
         self.md_converter = PenpotAPIContentMarkdownConverter()
-        self.base_url = "https://penpot-plugins-api-doc.pages.dev"
+        self.base_url = "https://penpot-plugins-api-doc-devel.kaleidos.workers.dev/"
         self.types: dict[str, TypeInfo] = {}
         self.type_referenced_by: dict[str, set[str]] = collections.defaultdict(set)
 
