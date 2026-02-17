@@ -44,6 +44,7 @@ export class PenpotMcpServer {
     private readonly port: number;
     private readonly webSocketPort: number;
     private readonly replPort: number;
+    private readonly taskTimeoutSecs: number;
     private readonly listenAddress: string;
     /**
      * the address (domain name or IP address) via which clients can reach the MCP server
@@ -55,6 +56,7 @@ export class PenpotMcpServer {
         this.port = parseInt(process.env.PENPOT_MCP_SERVER_PORT ?? "4401", 10);
         this.webSocketPort = parseInt(process.env.PENPOT_MCP_WEBSOCKET_PORT ?? "4402", 10);
         this.replPort = parseInt(process.env.PENPOT_MCP_REPL_PORT ?? "4403", 10);
+        this.taskTimeoutSecs = parseInt(process.env.PENPOT_MCP_TASK_TIMEOUT_SECS ?? "90", 10);
         this.listenAddress = process.env.PENPOT_MCP_SERVER_LISTEN_ADDRESS ?? "localhost";
         this.serverAddress = process.env.PENPOT_MCP_SERVER_ADDRESS ?? "localhost";
 
@@ -72,7 +74,7 @@ export class PenpotMcpServer {
         );
 
         this.tools = new Map<string, Tool<any>>();
-        this.pluginBridge = new PluginBridge(this, this.webSocketPort);
+        this.pluginBridge = new PluginBridge(this, this.webSocketPort, this.taskTimeoutSecs);
         this.replServer = new ReplServer(this.pluginBridge, this.replPort);
 
         this.registerTools();
@@ -240,6 +242,7 @@ export class PenpotMcpServer {
                 this.logger.info(`Modern Streamable HTTP endpoint: http://${this.serverAddress}:${this.port}/mcp`);
                 this.logger.info(`Legacy SSE endpoint: http://${this.serverAddress}:${this.port}/sse`);
                 this.logger.info(`WebSocket server URL: ws://${this.serverAddress}:${this.webSocketPort}`);
+                this.logger.info(`Plugin task timeout: ${this.taskTimeoutSecs}s`);
 
                 // start the REPL server
                 await this.replServer.start();
