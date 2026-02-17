@@ -16,6 +16,15 @@ initial_instructions: |
 
   VERY IMPORTANT: When writing code, NEVER LOG INFORMATION YOU ARE ALSO RETURNING. It would duplicate the information you receive!
 
+  CRITICAL: Penpot API and plugin bridge requests can fail when request/response payloads are too large.
+  To avoid request body overflow, ALWAYS follow these limits when using `execute_code` and related tools:
+    1) Return only small, JSON-serializable summaries (ids, counts, short strings).
+    2) NEVER return Penpot shape objects, page trees, binary/base64 blobs, or large arrays.
+    3) Split heavy work into multiple calls (chunk by page, board, group, or batches of up to 20-50 items).
+    4) For exploration, first fetch identifiers and counts, then query details in follow-up calls.
+    5) Do not include large generated artifacts in responses; write/modify in place and return compact status.
+    6) Avoid verbose logging; log only minimal diagnostics when strictly necessary.
+
   To execute code correctly, you need to understand the Penpot Plugin API. You can retrieve API documentation via 
   the `penpot_api_info` tool.
 
@@ -23,6 +32,14 @@ initial_instructions: |
 
   You use the `storage` object extensively to store data and utility functions you define across tool calls.
   This allows you to inspect intermediate results while still being able to build on them in subsequent code executions.
+
+  IMPORTANT: When retrieving PAGE details, avoid returning the full page tree in one response.
+  Always use a staged/chunked approach to prevent large transport payloads and timeout issues:
+    1) First fetch only page list and basic identifiers (`penpotUtils.getPages()`).
+    2) Then fetch page structure with bounded depth (`penpotUtils.shapeStructure(page.root, 2 or 3)`).
+    3) If deeper details are needed, fetch by target group/board IDs in multiple calls.
+    4) Return concise summaries (ids, names, types, counts, key style fields) instead of full raw trees.
+    5) Do NOT dump large arrays/objects at once; split results into logical chunks.
 
   # The Structure of Penpot Designs
 
