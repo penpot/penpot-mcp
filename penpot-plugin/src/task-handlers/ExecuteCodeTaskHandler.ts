@@ -2,89 +2,6 @@ import { Task, TaskHandler } from "../TaskHandler";
 import { ExecuteCodeTaskParams, ExecuteCodeTaskResultData } from "../../../common/src";
 import { PenpotUtils } from "../PenpotUtils.ts";
 
-const MAX_RESULT_NODES = 5000;
-const MAX_RESULT_DEPTH = 8;
-const MAX_ARRAY_ITEMS = 200;
-const MAX_OBJECT_KEYS = 200;
-const MAX_LOG_CHARS = 20000;
-
-function truncateString(value: string, maxChars: number): string {
-    if (value.length <= maxChars) {
-        return value;
-    }
-    return `${value.slice(0, maxChars)}\n...[truncated ${value.length - maxChars} chars]`;
-}
-
-function sanitizeForTransport(value: any): any {
-    const visited = new WeakSet<object>();
-    const state = { remainingNodes: MAX_RESULT_NODES };
-
-    const walk = (current: any, depth: number): any => {
-        if (state.remainingNodes <= 0) {
-            return "[Truncated: node limit reached]";
-        }
-
-        if (current === null || current === undefined) {
-            return current;
-        }
-
-        const currentType = typeof current;
-        if (currentType === "string" || currentType === "number" || currentType === "boolean") {
-            return current;
-        }
-
-        if (currentType === "bigint") {
-            return `${current.toString()}n`;
-        }
-
-        if (currentType === "function") {
-            return `[Function: ${current.name || "anonymous"}]`;
-        }
-
-        if (current instanceof Date) {
-            return current.toISOString();
-        }
-
-        if (depth >= MAX_RESULT_DEPTH) {
-            return `[Truncated: max depth ${MAX_RESULT_DEPTH} reached]`;
-        }
-
-        if (typeof current === "object") {
-            if (visited.has(current)) {
-                return "[Circular]";
-            }
-            visited.add(current);
-            state.remainingNodes -= 1;
-
-            if (Array.isArray(current)) {
-                const limited = current.slice(0, MAX_ARRAY_ITEMS).map((item) => walk(item, depth + 1));
-                if (current.length > MAX_ARRAY_ITEMS) {
-                    limited.push(`[Truncated: ${current.length - MAX_ARRAY_ITEMS} more items]`);
-                }
-                return limited;
-            }
-
-            const entries = Object.entries(current);
-            const limitedEntries = entries.slice(0, MAX_OBJECT_KEYS);
-            const output: Record<string, any> = {};
-
-            for (const [key, val] of limitedEntries) {
-                output[key] = walk(val, depth + 1);
-            }
-
-            if (entries.length > MAX_OBJECT_KEYS) {
-                output.__truncated__ = `${entries.length - MAX_OBJECT_KEYS} more keys`;
-            }
-
-            return output;
-        }
-
-        return String(current);
-    };
-
-    return walk(value, 0);
-}
-
 /**
  * Console implementation that captures all log output for code execution.
  *
@@ -283,10 +200,12 @@ export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
             return fn(...Object.values(ctx));
         })(context);
 
+        console.log("Code execution result:", result);
+
         // return result and captured log
         let resultData: ExecuteCodeTaskResultData<any> = {
-            result: sanitizeForTransport(result),
-            log: truncateString(this.context.console.getLog(), MAX_LOG_CHARS),
+            result: result,
+            log: this.context.console.getLog(),
         };
         task.sendSuccess(resultData);
     }

@@ -7,37 +7,6 @@ import { PenpotMcpServer } from "../PenpotMcpServer";
 import { ExecuteCodePluginTask } from "../tasks/ExecuteCodePluginTask";
 import { ExecuteCodeTaskParams } from "@penpot-mcp/common";
 
-const MAX_EXECUTE_CODE_RESPONSE_CHARS = 120000;
-
-function stringifyAndTruncate(value: unknown): string {
-    let serialized: string;
-
-    try {
-        serialized = JSON.stringify(value, null, 2);
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        serialized = JSON.stringify(
-            {
-                error: "Failed to serialize tool result",
-                reason: message,
-            },
-            null,
-            2
-        );
-    }
-
-    if (serialized.length <= MAX_EXECUTE_CODE_RESPONSE_CHARS) {
-        return serialized;
-    }
-
-    return [
-        serialized.slice(0, MAX_EXECUTE_CODE_RESPONSE_CHARS),
-        "",
-        `...[truncated ${serialized.length - MAX_EXECUTE_CODE_RESPONSE_CHARS} chars]`,
-        "Use smaller queries (e.g. shapeStructure with maxDepth) or split retrieval into chunks.",
-    ].join("\n");
-}
-
 /**
  * Arguments class for ExecuteCodeTool
  */
@@ -100,7 +69,7 @@ export class ExecuteCodeTool extends Tool<ExecuteCodeArgs> {
         const result = await this.mcpServer.pluginBridge.executePluginTask(task);
 
         if (result.data !== undefined) {
-            return new TextResponse(stringifyAndTruncate(result.data));
+            return new TextResponse(JSON.stringify(result.data, null, 2));
         } else {
             return new TextResponse("Code executed successfully with no return value.");
         }
