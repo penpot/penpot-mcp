@@ -1,0 +1,37 @@
+services:
+  penpot-mcp:
+    build:
+      context: .
+      # These build-args control the WebSocket URL baked into the plugin bundle.
+      # For local use the defaults (localhost) are correct.
+      # For a remote deployment, override PENPOT_MCP_SERVER_ADDRESS with your
+      # server's public hostname or IP address and rebuild the image.
+      args:
+        PENPOT_MCP_SERVER_ADDRESS: ${PENPOT_MCP_SERVER_ADDRESS:-localhost}
+        PENPOT_MCP_WEBSOCKET_PORT: ${PENPOT_MCP_WEBSOCKET_PORT:-4402}
+    image: penpot-mcp:latest
+    ports:
+      - "${PLUGIN_SERVER_PORT:-4400}:4400"   # Plugin static-file server
+      - "${MCP_SERVER_PORT:-4401}:4401"      # MCP HTTP / SSE endpoint
+      - "${WEBSOCKET_PORT:-4402}:4402"       # WebSocket (plugin <-> server)
+      - "${REPL_PORT:-4403}:4403"            # REPL (debug)
+    environment:
+      # Bind everything inside the container to all interfaces
+      PENPOT_MCP_SERVER_LISTEN_ADDRESS: "0.0.0.0"
+      PENPOT_MCP_SERVER_PORT: "4401"
+      PENPOT_MCP_WEBSOCKET_PORT: "4402"
+      PENPOT_MCP_REPL_PORT: "4403"
+      # Allow the plugin preview server to serve requests from any host header.
+      # Set to a comma-separated list of hostnames to restrict access.
+      PENPOT_MCP_PLUGIN_SERVER_LISTEN_ADDRESS: ${PENPOT_MCP_PLUGIN_SERVER_LISTEN_ADDRESS:-}
+      # Log level: trace | debug | info | warn | error
+      PENPOT_MCP_LOG_LEVEL: ${PENPOT_MCP_LOG_LEVEL:-info}
+      # Remote mode disables local file-system access (set true for remote deployments)
+      PENPOT_MCP_REMOTE_MODE: ${PENPOT_MCP_REMOTE_MODE:-false}
+    restart: unless-stopped
+    # Persist log files across container restarts
+    volumes:
+      - penpot-mcp-logs:/app/mcp-server/logs
+
+volumes:
+  penpot-mcp-logs:
