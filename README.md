@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/penpot-penpot-mcp-badge.png)](https://mseep.ai/app/penpot-penpot-mcp)
+
 > [!IMPORTANT]
 > This repository has been archived on 2026-02-03.  
 > Its contents have been fully integrated into the main Penpot repository:
