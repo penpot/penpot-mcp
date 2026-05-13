@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from "async_hooks";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { ExecuteCodeTool } from "./tools/ExecuteCodeTool";
+import { RenderLatexTool } from "./tools/RenderLatexTool";
 import { PluginBridge } from "./PluginBridge";
 import { ConfigurationLoader } from "./ConfigurationLoader";
 import { createLogger } from "./logger";
@@ -128,6 +129,7 @@ export class PenpotMcpServer {
         // Create relevant tool instances (depending on file system access)
         const toolInstances: Tool<any>[] = [
             new ExecuteCodeTool(this),
+            new RenderLatexTool(this),
             new HighLevelOverviewTool(this),
             new PenpotApiInfoTool(this, this.apiDocs),
             new ExportShapeTool(this), // tool adapts to file system access internally

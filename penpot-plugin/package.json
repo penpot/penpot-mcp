@@ -7,12 +7,14 @@
         "dev": "vite build --watch",
         "dev:multi-user": "cross-env MULTI_USER_MODE=true vite build --watch",
         "build": "tsc && vite build",
+        "postbuild": "node scripts/postbuild.mjs",
         "build:multi-user": "tsc && cross-env MULTI_USER_MODE=true vite build"
     },
     "dependencies": {
         "@penpot-mcp/common": "file:../common",
         "@penpot/plugin-styles": "1.4.1",
         "@penpot/plugin-types": "1.4.1",
+        "katex": "^0.16.45",
         "penpot-mcp": "file:.."
     },
     "devDependencies": {

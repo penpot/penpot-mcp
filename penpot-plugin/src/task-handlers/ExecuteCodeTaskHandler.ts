@@ -1,6 +1,9 @@
 import { Task, TaskHandler } from "../TaskHandler";
 import { ExecuteCodeTaskParams, ExecuteCodeTaskResultData } from "../../../common/src";
 import { PenpotUtils } from "../PenpotUtils.ts";
+import { nextRequestId, registerPending, LatexGlyph, LatexRenderResponse } from "../LatexBridge";
+
+const LATEX_TIMEOUT_MS = 30_000;
 
 /**
  * Console implementation that captures all log output for code execution.
@@ -175,12 +178,81 @@ export class ExecuteCodeTaskHandler extends TaskHandler<ExecuteCodeTaskParams> {
     constructor() {
         super();
 
-        // initialize context, making penpot, penpotUtils, storage and the custom console available
+        // initialize context, making penpot, penpotUtils, storage, console, and latex helper available
+        //
+        // The plugin sandbox has no DOM; latex rendering is routed to the UI iframe
+        // (see LatexBridge + main.ts handleLatexRender). The helper is async — callers
+        // must `await latex(...)`.
+        const latex = async (tex: string, opts: any = {}): Promise<any[]> => {
+            const fontSize: number = typeof opts.fontSize === "number" ? opts.fontSize : 16;
+            const xBase: number = typeof opts.x === "number" ? opts.x : 0;
+            const yBase: number = typeof opts.y === "number" ? opts.y : 0;
+            const inkColor: string = opts.color || "#1f2229";
+            const parent = opts.parent || null;
+            const display: boolean = opts.display !== false;
+
+            const requestId = nextRequestId();
+            const resp: LatexRenderResponse = await new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error(`latex render timed out after ${LATEX_TIMEOUT_MS}ms`));
+                }, LATEX_TIMEOUT_MS);
+                registerPending(requestId, (r) => {
+                    clearTimeout(timer);
+                    resolve(r);
+                });
+                penpot.ui.sendMessage({
+                    type: "latex-render",
+                    requestId,
+                    tex,
+                    opts: { fontSize, display },
+                });
+            });
+
+            if (resp.error) {
+                throw new Error(resp.error);
+            }
+
+            const glyphs: LatexGlyph[] = resp.glyphs ?? [];
+            const created: any[] = [];
+            // t.x / t.y are page absolute coordinates. If a board parent is given,
+            // its (page x, page y) must be added so glyphs land *inside* the board.
+            const xOff = (parent && parent.type === "board") ? parent.x : 0;
+            const yOff = (parent && parent.type === "board") ? parent.y : 0;
+            // Korean glyphs need a Hangul font; math/Greek/Latin need a math-capable font.
+            // STIX Two Text covers Greek + math operators (Σ α ∫ → …). Hangul falls back
+            // to Noto Sans KR. Detected per-glyph.
+            const hangul = /[ᄀ-ᇿ㄰-㆏가-힯]/;
+            for (const g of glyphs) {
+                const t = (penpot as any).createText(g.text);
+                if (!t) continue;
+                t.growType = "auto-width";
+                if (hangul.test(g.text)) {
+                    t.fontId = "gfont-noto-sans-kr";
+                    t.fontFamily = "Noto Sans KR";
+                } else {
+                    t.fontId = "gfont-stix-two-text";
+                    t.fontFamily = "STIX Two Text";
+                }
+                t.fontVariantId = "regular";
+                t.fontWeight = "400";
+                t.fontSize = String(Math.round(g.fontSize));
+                t.fills = [{ fillColor: inkColor, fillOpacity: 1 }];
+                t.x = xOff + xBase + g.x;
+                t.y = yOff + yBase + g.y;
+                if (parent && typeof parent.appendChild === "function") {
+                    parent.appendChild(t);
+                }
+                created.push(t);
+            }
+            return created;
+        };
+
         this.context = {
             penpot: penpot,
             storage: {},
             console: new ExecuteCodeTaskConsole(),
             penpotUtils: PenpotUtils,
+            latex,
         };
     }
 

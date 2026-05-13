@@ -1,5 +1,6 @@
 import { ExecuteCodeTaskHandler } from "./task-handlers/ExecuteCodeTaskHandler";
 import { Task, TaskHandler } from "./TaskHandler";
+import { handleLatexResponse } from "./LatexBridge";
 
 /**
  * Registry of all available task handlers.
@@ -14,9 +15,12 @@ const isMultiUserMode = typeof IS_MULTI_USER_MODE !== "undefined" ? IS_MULTI_USE
 penpot.ui.open("Penpot MCP Plugin", `?theme=${penpot.theme}&multiUser=${isMultiUserMode}`, { width: 300, height: 250 });
 
 // Handle messages
-penpot.ui.onMessage<string | { id: string; task: string; params: any }>((message) => {
+penpot.ui.onMessage<any>((message) => {
+    // LatexBridge consumes its own responses first; if it handled the message, stop.
+    if (handleLatexResponse(message)) return;
+
     // Handle plugin task requests
-    if (typeof message === "object" && message.task && message.id) {
+    if (typeof message === "object" && message && message.task && message.id) {
         handlePluginTaskRequest(message).catch((error) => {
             console.error("Error in handlePluginTaskRequest:", error);
         });

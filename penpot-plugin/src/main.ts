@@ -1,4 +1,6 @@
 import "./style.css";
+import katex from "katex/dist/katex.mjs";
+import "katex/dist/katex.min.css";
 
 // get the current theme from the URL
 const searchParams = new URLSearchParams(window.location.search);
@@ -11,6 +13,44 @@ console.log("Penpot MCP multi-user mode:", isMultiUserMode);
 // WebSocket connection management
 let ws: WebSocket | null = null;
 const statusElement = document.getElementById("connection-status");
+
+// Keepalive / auto-reconnect state
+let keepaliveTimer: number | null = null;
+let reconnectTimer: number | null = null;
+let userClosed = false;  // true if user intentionally closed; auto-reconnect skipped
+const KEEPALIVE_INTERVAL_MS = 25_000;   // < 90s plugin-side idle threshold
+const RECONNECT_DELAY_MS = 3_000;
+
+function stopKeepalive(): void {
+    if (keepaliveTimer !== null) {
+        clearInterval(keepaliveTimer);
+        keepaliveTimer = null;
+    }
+}
+
+function startKeepalive(): void {
+    stopKeepalive();
+    keepaliveTimer = window.setInterval(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            try {
+                // Application-level ping; server ignores unknown id.
+                ws.send(JSON.stringify({ __keepalive: true, ts: Date.now() }));
+            } catch (e) {
+                console.warn("keepalive send failed:", e);
+            }
+        }
+    }, KEEPALIVE_INTERVAL_MS);
+}
+
+function scheduleReconnect(): void {
+    if (userClosed) return;
+    if (reconnectTimer !== null) return;
+    reconnectTimer = window.setTimeout(() => {
+        reconnectTimer = null;
+        console.log("Auto-reconnecting to MCP server…");
+        connectToMcpServer();
+    }, RECONNECT_DELAY_MS);
+}
 
 /**
  * Updates the connection status display element.
@@ -63,6 +103,8 @@ function connectToMcpServer(): void {
         ws.onopen = () => {
             console.log("Connected to MCP server");
             updateConnectionStatus("Connected to MCP server", true);
+            userClosed = false;
+            startKeepalive();
         };
 
         ws.onmessage = (event) => {
@@ -77,10 +119,12 @@ function connectToMcpServer(): void {
         };
 
         ws.onclose = (event: CloseEvent) => {
-            console.log("Disconnected from MCP server");
+            console.log("Disconnected from MCP server (code=" + event.code + ")");
             const message = event.reason || undefined;
-            updateConnectionStatus("Disconnected", false, message);
+            updateConnectionStatus(userClosed ? "Disconnected" : "Reconnecting…", false, message);
             ws = null;
+            stopKeepalive();
+            scheduleReconnect();
         };
 
         ws.onerror = (error) => {
@@ -101,10 +145,116 @@ document.querySelector("[data-handler='connect-mcp']")?.addEventListener("click"
 
 // Listen plugin.ts messages
 window.addEventListener("message", (event) => {
-    if (event.data.source === "penpot") {
-        document.body.dataset.theme = event.data.theme;
-    } else if (event.data.type === "task-response") {
+    const data = event.data;
+    if (!data || typeof data !== "object") return;
+    if (data.source === "penpot") {
+        document.body.dataset.theme = data.theme;
+    } else if (data.type === "task-response") {
         // Forward task response back to MCP server
-        sendTaskResponse(event.data.response);
+        sendTaskResponse(data.response);
+    } else if (data.type === "latex-render") {
+        handleLatexRender(data).catch((err) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error("latex-render error:", msg);
+            parent.postMessage(
+                { type: "latex-render-response", requestId: data.requestId, error: msg },
+                "*",
+            );
+        });
     }
 });
+
+// ---- LaTeX rendering bridge (server side) ---------------------------------
+//
+// The plugin sandbox has no DOM, so we render KaTeX here (UI iframe) and reply
+// with measured glyphs that the plugin can turn into Penpot text nodes.
+
+let _katexFontsReady = false;
+
+async function ensureKatexFonts(): Promise<void> {
+    if (_katexFontsReady) return;
+    try {
+        await (document as any).fonts?.ready;
+    } catch (_e) {
+        // ignore — fall through with whatever metrics the browser has
+    }
+    _katexFontsReady = true;
+}
+
+async function handleLatexRender(req: {
+    requestId: string;
+    tex: string;
+    opts?: { fontSize?: number; display?: boolean };
+}): Promise<void> {
+    await ensureKatexFonts();
+    const fontSize = req.opts?.fontSize ?? 16;
+    const display = req.opts?.display !== false;
+
+    let html: string;
+    try {
+        html = (katex as any).renderToString(req.tex, {
+            displayMode: display,
+            throwOnError: false,
+            output: "html",
+        });
+    } catch (e: any) {
+        parent.postMessage(
+            {
+                type: "latex-render-response",
+                requestId: req.requestId,
+                error: `KaTeX render failed: ${e?.message ?? String(e)}`,
+            },
+            "*",
+        );
+        return;
+    }
+
+    const tmp = document.createElement("div");
+    tmp.style.cssText =
+        `position:absolute;left:-9999px;top:-9999px;font-size:${fontSize}px;visibility:hidden;`;
+    tmp.innerHTML = html;
+    document.body.appendChild(tmp);
+
+    // Force layout by reading bounds.
+    const baseRect = tmp.getBoundingClientRect();
+
+    const glyphs: Array<{ text: string; x: number; y: number; fontSize: number; italic: boolean }> = [];
+
+    const walk = (node: Element): void => {
+        if (node.children.length === 0) {
+            const txt = node.textContent ?? "";
+            if (txt.trim().length > 0) {
+                const rect = node.getBoundingClientRect();
+                const cs = window.getComputedStyle(node);
+                const sz = parseFloat(cs.fontSize) || fontSize;
+                const ff = cs.fontFamily || "";
+                const italic = cs.fontStyle === "italic" || ff.includes("KaTeX_Math");
+                glyphs.push({
+                    text: txt,
+                    x: rect.left - baseRect.left,
+                    y: rect.top - baseRect.top,
+                    fontSize: sz,
+                    italic,
+                });
+            }
+        } else {
+            for (const c of Array.from(node.children)) walk(c as Element);
+        }
+    };
+
+    if (tmp.firstElementChild) walk(tmp.firstElementChild);
+
+    const finalRect = tmp.getBoundingClientRect();
+    document.body.removeChild(tmp);
+
+    parent.postMessage(
+        {
+            type: "latex-render-response",
+            requestId: req.requestId,
+            glyphs,
+            width: finalRect.width,
+            height: finalRect.height,
+        },
+        "*",
+    );
+}

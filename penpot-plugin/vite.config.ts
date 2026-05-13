@@ -11,6 +11,7 @@ const websocketUrl = `ws://${serverAddress}:${websocketPort}`;
 console.log("Will define PENPOT_MCP_WEBSOCKET_URL as:", JSON.stringify(websocketUrl));
 
 export default defineConfig({
+    base: "./",
     plugins: [
         livePreview({
             reload: true,
@@ -28,7 +29,8 @@ export default defineConfig({
                 index: "./index.html",
             },
             output: {
-                entryFileNames: "[name].js",
+                entryFileNames: (chunk) =>
+                    chunk.name === "plugin" ? "plugin-[hash].js" : "[name].js",
             },
         },
     },
@@ -38,6 +40,11 @@ export default defineConfig({
         allowedHosts: process.env.PENPOT_MCP_PLUGIN_SERVER_LISTEN_ADDRESS
             ? process.env.PENPOT_MCP_PLUGIN_SERVER_LISTEN_ADDRESS.split(",").map((h) => h.trim())
             : [],
+        headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
     },
     define: {
         IS_MULTI_USER_MODE: JSON.stringify(process.env.MULTI_USER_MODE === "true"),
